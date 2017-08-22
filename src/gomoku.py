@@ -1,10 +1,12 @@
 '''
 Universidade Federal de Santa Catarina
 INE5430 - Inteligencia Artificial
-Autores: Andrei Donati, Igor Yamamoto, Luis Felipe Pelison
+Authors: Andrei Donati, Igor Yamamoto, Luis Felipe Pelison
 '''
 
 import numpy as np
+import matplotlib.pyplot as plt
+
 
 class State(object):
     '''
@@ -57,6 +59,17 @@ class Gomoku(object):
         # aplly move to the game
         self.current_state = self.current_state.next_state(move)
     
+    def display(self):
+        plt.imshow(game.current_state.board, 
+                   interpolation='nearest', 
+                   cmap=plt.cm.cubehelix,
+                   vmin=-1,
+                   vmax=1)
+        plt.xticks(range(self.width), range(1, self.width+1))
+        plt.yticks(range(self.height), range(1, self.height+1))
+        plt.grid(True)
+        plt.show()
+        
     def __bool__(self):
         # return True if is not gameover, otherwise return false
         return not self.current_state.is_gameover()
@@ -68,21 +81,19 @@ class Gomoku(object):
 
 if __name__ == '__main__':
     # Game play code
-    print("Gomoku!\n")
+    print("------------------------------------------Gomoku!------------------------------------------")
     game = Gomoku()
-    print(game)
+    game.display()    
     while game:
         #player_move = ask for human move
         player_move = input('your turn! move: ').split(',')
-        player_move = tuple(map(int, player_move))
-        print(player_move)
+        player_move = tuple(map(lambda x: int(x)-1, player_move))
         game.make_move(player_move)
-        print(game)
+        game.display()
         
         # computer move = aplly minimax
         computer_move = input('thinking... move: ').split(',')
-        computer_move = tuple(map(int, computer_move))
-        print(computer_move)
+        computer_move = tuple(map(lambda x: int(x)-1, computer_move))
         game.make_move(computer_move)
-        print(game)
+        game.display()
     print('\nGame Over!!!')
