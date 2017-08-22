@@ -85,26 +85,70 @@ def changeValues(matrix, player):
         This function replace values of the matrix from integer to string 
     
     '''
-    matrix = matrix[1:len(matrix)-1,1:len(matrix)-1].copy()
+    matrix = matrix[1:len(matrix)-1,1:len(matrix)-1].copy() # corta a matrix em uma 15x15
     if player==-1:
-        matrix[matrix==-1]= 'b'
-        matrix[matrix==1]= 'p'     
-        matrix[matrix==0]= 'v'
-    else: 
-    
-    return matrix.
+        matrix[matrix==0]= 'b'
+        matrix[matrix==1]= 'n'     
+        matrix[matrix==2]= 'n'
+        matrix[matrix==-1]= 'x'
+    else:
+        matrix[matrix==0]= 'b'
+        matrix[matrix==1]= 'x'
+        matrix[matrix==2]= 'n'     
+        matrix[matrix==-1]= 'n'
+    return matrix
 
-def makeDig(matrix):
+    
+def makeDig(matrix, player):
     '''
         
     '''
-    matrix = matrix[1:len(matrix)-1,1:len(matrix)-1]
-    diags_sec = [matrix[::-1,:].diagonal(i) for i in range(-matrix.shape[1]+5,matrix.shape[1]-4)]
-    diags_princ = [ matrix.diagonal(i) for i in range(matrix.shape[1]-1, -matrix.shape[1],-1) ]
-    list1 = [1, 2, 3]
-    str1 = ''.join(str(e) for e in list1)
-    print([n.tolist() for n in diags_sec])
-    #print([n.tolist() for n in diags_princ])
+    
+    dig = [matrix[::-1,:].diagonal(i) for i in range(-matrix.shape[1]+5,matrix.shape[1]-4)]
+    dig_sec=[]
+    dig_pri = []    
+    #str1='' 
+    for i in dig:
+        for e in i:
+            #print('1')
+            if player==-1:
+                if e==0:
+                    str1 = ''.join('b')
+                elif (e==1 or e==2):
+                    str1 = ''.join('n')
+                elif(e==-1):
+                    str1 = ''.join('x')
+            else:
+                if e==0:
+                    str1 = ''.join('b')
+                elif (e==-1 or e==2):
+                    str1 = ''.join('n')
+                elif(e==1):
+                    str1 = ''.join('x')       
+        dig_sec.append(str1)
+        
+    dig = [ matrix.diagonal(i) for i in range(matrix.shape[1]-5, -matrix.shape[1]+4,-1) ]
+    for i in dig:
+        #str2=''
+        for e in i:
+            #print('2')
+            if player==-1:
+                if e==0:
+                    str2 = ''.join('b')
+                elif (e==1 or e==2):
+                    str2 = ''.join('n')
+                elif(e==-1):
+                    str2 = ''.join('x')
+            else:
+                if e==0:
+                    str2 = ''.join('b')
+                elif (e==-1 or e==2):
+                    str2 = ''.join('n')
+                elif(e==1):
+                    str2 = ''.join('x')       
+        dig_pri.append(str2)
+    
+    return dig_pri, dig_sec
     
 
 def makeCol(matrix):
@@ -117,6 +161,7 @@ def makeLin(matrix):
     '''
     matrix = matrix[1:len(matrix)-1,1:len(matrix)-1]
     
+
 def quintet(stateString):
     
 
