@@ -10,19 +10,17 @@ Authors:
 import numpy as np
 import regex as re
 
-Utility = {'numberOfQuintet': [quintet, 200000,['xxxxx'] ], 
-'numberOfQuartet_2Opens': [quartet_2opens, 120000,['exxxxe']],
-'numberOfQuintet': [quintet, 200000, ['xxxxx']], 
-'numberOfQuartet_2Opens': [quartet_2opens, 120000, ['exxxxe']],
-'numberOfQuartet_1Open': [quartet_1open, 50000, ['nxxxxe', 'exxxxn']], 
-'numberOfTriplet_2Opens': [triplet_2opens, 30000, ['exxxe']],
-'numberOfTriplet_1Open': [triplet_1open, 15000, ['nxxxee', 'eexxxn']],
-'numberOfProbQuartet_2Opens': [prob_quartet_2opens, 7000, ['exexxe', 'exxexe']],
-'numberOfProbQuartet_1Open': [prob_quartet_1open, 3000, ['nxexxe', 'nxxexe','exxexn','exexxn']],
-'numberOfDouble_2Opens': [double_2opens, 1000, ['eexxe', 'exxee']],
-'numberOfDouble_1Open': [double_1open, 400, ['nxxeee', 'eeexxn']],
-'numberOfProbTriplet_2Opens': [prob_triplet_2opens, 100, ['exexe']],
-'numberOfProbTriplet_1Open': [prob_triplet_1open, 40, ['nxexee', 'eexexn']]
+Utility = {'numberOfQuintet': [ 200000, ['xxxxx']], 
+'numberOfQuartet_2Opens': [ 120000, ['exxxxe']],
+'numberOfQuartet_1Open': [ 50000, ['nxxxxe', 'exxxxn']], 
+'numberOfTriplet_2Opens': [ 30000, ['exxxe']],
+'numberOfTriplet_1Open': [ 15000, ['nxxxee', 'eexxxn']],
+'numberOfProbQuartet_2Opens': [ 7000, ['exexxe', 'exxexe']],
+'numberOfProbQuartet_1Open': [ 3000, ['nxexxe', 'nxxexe','exxexn','exexxn']],
+'numberOfDouble_2Opens': [ 1000, ['eexxe', 'exxee']],
+'numberOfDouble_1Open': [ 400, ['nxxeee', 'eeexxn']],
+'numberOfProbTriplet_2Opens': [ 100, ['exexe']],
+'numberOfProbTriplet_1Open': [ 40, ['nxexee', 'eexexn']]
 }
 
 
@@ -64,11 +62,11 @@ def calculateHeuristic(state, heuristicValues, positionValuesHeuristic ):
     sequenceHeuristic = 0
     positionHeuristic =0
     
-    for fn in heuristicValues.keys():
+    for values in heuristicValues.keys():
         
-        numberSequences = heuristicValues[fn][0]()
+        sequence = heuristicValues[values][1]
         
-        ValueSequence = heuristicValues[fn][1]
+        ValueSequence = heuristicValues[values][0]
         
         sequenceHeuristic += sequenceHeuristic
         
@@ -80,24 +78,6 @@ def calculateHeuristic(state, heuristicValues, positionValuesHeuristic ):
     HeuristicValue= positionHeuristic + sequenceHeuristic
     return HeuristicValue
 
-def changeValues(matrix, player):
-    '''
-        This function replace values of the matrix from integer to string 
-    
-    '''
-    matrix = matrix[1:len(matrix)-1,1:len(matrix)-1].copy() # corta a matrix em uma 15x15
-    if player==-1:
-        matrix[matrix==0]= 'b'
-        matrix[matrix==1]= 'n'     
-        matrix[matrix==2]= 'n'
-        matrix[matrix==-1]= 'x'
-    else:
-        matrix[matrix==0]= 'b'
-        matrix[matrix==1]= 'x'
-        matrix[matrix==2]= 'n'     
-        matrix[matrix==-1]= 'n'
-    return matrix
-
     
 def makeDig(matrix, player):
     '''
@@ -105,19 +85,19 @@ def makeDig(matrix, player):
     '''
     
     dig = [matrix[::-1,:].diagonal(i) for i in range(-matrix.shape[1]+5,matrix.shape[1]-4)]
-    dig_sec=[]
-    dig_pri = []    
-    #str1='' 
+    diagonal=[]
+  
     for i in dig:
+        str1=''
         for e in i:
-            #print('1')
-            if player==-1:
+            
+            if player==1:
                 if e==0:
-                    str1 = ''.join('b')
+                    str1 += 'b'
                 elif (e==1 or e==2):
-                    str1 = ''.join('n')
+                    str1 += 'n'
                 elif(e==-1):
-                    str1 = ''.join('x')
+                    str1 +='x' 
             else:
                 if e==0:
                     str1 = ''.join('b')
@@ -125,47 +105,84 @@ def makeDig(matrix, player):
                     str1 = ''.join('n')
                 elif(e==1):
                     str1 = ''.join('x')       
-        dig_sec.append(str1)
+        diagonal.append(str1)
         
     dig = [ matrix.diagonal(i) for i in range(matrix.shape[1]-5, -matrix.shape[1]+4,-1) ]
     for i in dig:
-        #str2=''
+        str1=''
         for e in i:
-            #print('2')
-            if player==-1:
+            if player==1:
                 if e==0:
-                    str2 = ''.join('b')
+                    str1 += 'b'
                 elif (e==1 or e==2):
-                    str2 = ''.join('n')
+                    str1 += 'n'
                 elif(e==-1):
-                    str2 = ''.join('x')
+                    str1 +='x' 
             else:
                 if e==0:
-                    str2 = ''.join('b')
+                    str1 = ''.join('b')
                 elif (e==-1 or e==2):
-                    str2 = ''.join('n')
+                    str1 = ''.join('n')
                 elif(e==1):
-                    str2 = ''.join('x')       
-        dig_pri.append(str2)
+                    str1 = ''.join('x')       
+        diagonal.append(str1)
     
-    return dig_pri, dig_sec
-    
-
-def makeCol(matrix):
-    '''
-    '''
-    matrix = matrix[1:len(matrix)-1,1:len(matrix)-1]
-    
-def makeLin(matrix):
-    '''
-    '''
-    matrix = matrix[1:len(matrix)-1,1:len(matrix)-1]
+    return diagonal
     
 
-def quintet(stateString):
+def makeCol(matrix, player):
+    '''
+    '''
+    diagonal=[]
+    for i in matrix:
+        str1=''
+        for e in i:
+            
+            if player==1:
+                if e==0:
+                    str1 += 'b'
+                elif (e==1 or e==2):
+                    str1 += 'n'
+                elif(e==-1):
+                    str1 +='x' 
+            else:
+                if e==0:
+                    str1 = ''.join('b')
+                elif (e==-1 or e==2):
+                    str1 = ''.join('n')
+                elif(e==1):
+                    str1 = ''.join('x')       
+        diagonal.append(str1)
+    return diagonal
+    #matrix = matrix[1:len(matrix)-1,1:len(matrix)-1]
     
-
+def makeLin(matrix, player):
+    '''
+    '''
+    diagonal=[]
+    matrix = matrix.copy().T
+    for i in matrix:
+        str1=''
+        for e in i:
+            
+            if player==1:
+                if e==0:
+                    str1 += 'b'
+                elif (e==1 or e==2):
+                    str1 += 'n'
+                elif(e==-1):
+                    str1 +='x' 
+            else:
+                if e==0:
+                    str1 = ''.join('b')
+                elif (e==-1 or e==2):
+                    str1 = ''.join('n')
+                elif(e==1):
+                    str1 = ''.join('x')       
+        diagonal.append(str1)
+    return diagonal
     
+  
     
 def countOccurrences(text, search_for):
     return len(re.findall(search_for, text, overlapped=True))
