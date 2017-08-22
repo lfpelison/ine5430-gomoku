@@ -1,0 +1,1 @@
+img1 -> downloaded from https://skillgamesboard.com/GamesResources/renju/Images/is_renju.jpg
