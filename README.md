@@ -14,5 +14,7 @@ Autores:
 
 Instruções de uso:
 - git clone git@github.com:igoryamamoto/ine5430-gomoku.git
-- cd ine5430-gomoku/src/
+- cd ine5430-gomoku/
+- pip install -r requirements.txt
+- cd src/
 - python3 gomoku.py
