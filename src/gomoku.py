@@ -23,8 +23,15 @@ class State(object):
         pass
     
     def is_valid_move(self, move):
-        moves = self.get_available_moves()
-        return move in moves
+        try:
+            if self.board[move] == 0:
+                return True
+            else:
+                print('\nThis position of the board is already taken...\n')
+                return False
+        except IndexError:
+            print('\nBoard dimension is {}\n'.format(self.board.shape))
+            return False
     
     def is_gameover(self):
         # A board is terminal if it is won or there are no empty spaces.
@@ -56,17 +63,28 @@ class Gomoku(object):
         self.current_state = State(initial_board, player)
     
     def make_move(self, move):
-        # aplly move to the game
         self.current_state = self.current_state.next_state(move)
     
+    def player_move(self):
+        while True:
+            try:
+                move = input('your turn! move: ').split(',')
+                move = tuple(map(lambda x: int(x)-1, move))
+            except ValueError:
+                print('\nProvide the coordinates separated by comma, e.g.: 1,1\n')
+            if self.current_state.is_valid_move(move):
+                self.make_move(move)
+                break
+            print('\nInvalid move!\n')
+        
     def display(self):
         plt.imshow(game.current_state.board, 
                    interpolation='nearest', 
                    cmap=plt.cm.cubehelix,
                    vmin=-1,
                    vmax=1)
-        plt.xticks(range(self.width), range(1, self.width+1))
-        plt.yticks(range(self.height), range(1, self.height+1))
+        plt.xticks(range(self.width), ['']*self.width)
+        plt.yticks(range(self.height), ['']*self.height)
         plt.grid(True)
         plt.show()
         
@@ -81,19 +99,15 @@ class Gomoku(object):
 
 if __name__ == '__main__':
     # Game play code
-    print("------------------------------------------Gomoku!------------------------------------------")
+    print("------------------Gomoku!------------------")
     game = Gomoku()
     game.display()    
     while game:
         #player_move = ask for human move
-        player_move = input('your turn! move: ').split(',')
-        player_move = tuple(map(lambda x: int(x)-1, player_move))
-        game.make_move(player_move)
+        game.player_move()
         game.display()
         
         # computer move = aplly minimax
-        computer_move = input('thinking... move: ').split(',')
-        computer_move = tuple(map(lambda x: int(x)-1, computer_move))
-        game.make_move(computer_move)
+        game.player_move()
         game.display()
     print('\nGame Over!!!')
