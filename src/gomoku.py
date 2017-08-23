@@ -1,22 +1,28 @@
 '''
 Universidade Federal de Santa Catarina
 INE5430 - Inteligencia Artificial
-Authors: Andrei Donati, Igor Yamamoto, Luis Felipe Pelison
+Authors: 
+    Andrei Donati
+    Igor Yamamoto
+    Luis Felipe Pelison
+File description:
+    Main file to play the game.
 '''
 
 import numpy as np
 import matplotlib.pyplot as plt
 
-
 class State(object):
     '''
     Game state (graph nodes)
-    state: numpy 2D array
+    board: numpy 2D array
+    player: 1 (player one) or -1 (player two)
+    heuristic_val: number calculated from heuristics
     '''
     def __init__(self, board, player):
         self.board = board
         self.player = player
-        self.heuristic_val = self.compute_heuristic()
+        self.heuristic_val = self.calculate_heuristic()
         
     def get_available_moves(self):
         # get the empty positions of the board
@@ -35,10 +41,12 @@ class State(object):
     
     def is_gameover(self):
         # A board is terminal if it is won or there are no empty spaces.
-        pass
+        if 0 in self.board:
+            return False
+        else:
+            return True
     
-    def compute_heuristic(self):
-        # from board calculate heuristic value
+    def calculate_heuristic(self):
         pass
     
     def next_state(self, move):
@@ -50,10 +58,9 @@ class State(object):
 class Gomoku(object):
     '''
     Game controller
-    height x width board
-    current_board: current state of the game, it is a matrix of 1's (player one), 0's (empty) or -1's (player two)
-    player: 1 (player one) or -1 (player two)
-    
+    height: board height
+    width: board width
+    current_state: current state of the game
     '''
     
     def __init__(self, height=15, width=15, player=1):
@@ -93,7 +100,7 @@ class Gomoku(object):
         return not self.current_state.is_gameover()
     
     def __repr__(self):
-        # print current state of the game
+        # print current board of the game
         return '{}'.format(self.current_state.board)
 
 

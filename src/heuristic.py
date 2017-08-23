@@ -1,14 +1,17 @@
-"""
-This code calcutale de heuristc function to the game.
-
+'''
+Universidade Federal de Santa Catarina
+INE5430 - Inteligencia Artificial
 Authors:
     Andrei Donati
     Igor Yamamoto
-    Luis Felipe Pelison 
-"""
+    Luis Felipe Pelison
+File description:
+    This module implements a heuristic function for the game.
+'''
 
 import numpy as np
 import regex as re
+
 
 Utility = {'numberOfQuintet': [ 200000, ['xxxxx']], 
 'numberOfQuartet_2Opens': [ 120000, ['exxxxe']],
