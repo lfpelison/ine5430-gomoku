@@ -12,12 +12,21 @@ File description:
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 class State(object):
     '''
-    Game state (graph nodes)
-    board: numpy 2D array
-    player: 1 (player one) or -1 (player two)
-    heuristic_val: number calculated from heuristics
+    Class description: 
+        Game state (graph nodes).
+    Attributes:
+        board: numpy 2D array.
+        player: 1 (player one) or -1 (player two).
+        heuristic_val: number calculated from heuristics.
+    Methods:
+        get_available_moves: returns all possible moves, given a board configuration.
+        is_valid_move: verify if the move is valid.
+        is_gameover: verify if the state is terminal.
+        calculate_heuristic: returns a numeric value from heuristic function.
+        next_state: returns the next state, from the state itself and a move.
     '''
     def __init__(self, board, player):
         self.board = board
@@ -57,10 +66,17 @@ class State(object):
     
 class Gomoku(object):
     '''
-    Game controller
-    height: board height
-    width: board width
-    current_state: current state of the game
+    Class description: 
+        Game controller. It stores the current state of the game and displays the
+        board and contains the game actions to play.
+    Attributes:
+        height: board height
+        width: board width
+        current_state: current state of the game
+    Methods:
+        make_move: changes the state of the game from a move.
+        player_move: asks for a human player to play.
+        display: shows the board in a colored graphic.
     '''
     
     def __init__(self, height=15, width=15, player=1):
