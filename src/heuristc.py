@@ -43,7 +43,7 @@ Heuristic = [
 ]
  
 
-def calculateHeuristic(state, heuristicValues, positionValuesHeuristic ):
+def calculateHeuristic(state, heuristicValues, positionValuesHeuristic,player ):
     '''  state= numpy matrix with 1's, 0's and -1's meaning the actual 
          state of the game
          heuristicValues =  dict with keys with the type of heuristc
@@ -57,18 +57,24 @@ def calculateHeuristic(state, heuristicValues, positionValuesHeuristic ):
          The output is a integer with the value of a heuristc of the state.
          
     '''    
-    stateString = changeValues(state)       
-        
+    
     sequenceHeuristic = 0
     positionHeuristic =0
     
     for values in heuristicValues.keys():
         
         sequence = heuristicValues[values][1]
-        
         ValueSequence = heuristicValues[values][0]
+        occurrences = 0
+       
+        occurrences += searchInList(makeDig(state, player), sequence)
+        occurrences += searchInList(makeCol(state, player), sequence)
+        occurrences += searchInList(makeLin(state, player), sequence)
+     
+                   
         
-        sequenceHeuristic += sequenceHeuristic
+        
+        sequenceHeuristic += occurrences*ValueSequence
         
     
         
@@ -81,7 +87,7 @@ def calculateHeuristic(state, heuristicValues, positionValuesHeuristic ):
     
 def makeDig(matrix, player):
     '''
-        
+         Make a vector with the diagonals of the matrix 
     '''
     
     dig = [matrix[::-1,:].diagonal(i) for i in range(-matrix.shape[1]+5,matrix.shape[1]-4)]
@@ -132,6 +138,7 @@ def makeDig(matrix, player):
 
 def makeCol(matrix, player):
     '''
+         Make a vector with the collumns of the matrix 
     '''
     diagonal=[]
     for i in matrix:
@@ -158,6 +165,7 @@ def makeCol(matrix, player):
     
 def makeLin(matrix, player):
     '''
+        Make a vector with the lines of the matrix 
     '''
     diagonal=[]
     matrix = matrix.copy().T
@@ -182,10 +190,26 @@ def makeLin(matrix, player):
         diagonal.append(str1)
     return diagonal
     
+    
+def searchInList(Lists, searchFor):
+    '''
+    List: a list of lists with string values
+    seachFor: string to search for
+    '''
+    occurrences=0
+    for List in Lists:
+        occurrences+= countOccurrences(List, searchFor)
+          
+    return occurrences
+        
+    
   
     
-def countOccurrences(text, search_for):
-    return len(re.findall(search_for, text, overlapped=True))
+def countOccurrences(text, searchFor):
+    '''
+        Count all occurrences of the string "searchFor" in the text "text"
+    '''
+    return len(re.findall(searchFor, text, overlapped=True))
 
 
     
