@@ -5,7 +5,14 @@ Trabalho 1 da disciplina de Inteligência Artificial - Métodos de busca
 
 Algoritmo MinMax com Poda Alpha-Beta
 
+Implementação em Python 3
+
 Autores:
 - Andrei Donati
 - Ígor Yamamoto
 - Luis Felipe Pelison
+
+Instruções de uso:
+- git clone git@github.com:igoryamamoto/ine5430-gomoku.git
+- cd ine5430-gomoku/src/
+- python3 gomoku.py
