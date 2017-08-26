@@ -6,6 +6,7 @@ import random
 import numpy as np
 from functools import partial
 from heuristic import *
+from decideMove import *
 
 
 class Game:
@@ -142,6 +143,7 @@ class Game:
                     self.quitBtn.invoke()
                     return 1
             
+            
             self.nextMove()
             print('Heuristica PC: ' + str( self.actualHeuristic[0]) )           
             
@@ -181,7 +183,7 @@ class Game:
         
     def is_gameover_pc(self):
         # A board is terminal if it is won or there are no empty spaces.
-        if (0 in self.state and calculateHeuristic(self.state, self.finalState, self.heuristic, self.player)[1] ):
+        if (0 in self.state and finished(self.state, self.finalState,self.player)):
             return False
         else:
             
@@ -189,7 +191,7 @@ class Game:
     
     def is_gameover_player(self):
         # A board is terminal if it is won or there are no empty spaces.
-        if ( 0 in self.state  and calculateHeuristic(self.state, self.finalState, self.heuristic, self.pc)[1] ):
+        if ( 0 in self.state  and finished(self.state, self.finalState,self.pc) ):
             
             return False
         else:
@@ -203,18 +205,20 @@ class Game:
                 return b
         
     def calculate_heuristic_pc(self):
-        self.actualHeuristic[0]= calculateHeuristic(self.state, self.utility, self.heuristic, self.pc)[0]
+        self.actualHeuristic[0]= calculateHeuristic(self.state, self.utility, self.heuristic, self.pc)
                
         pass
     
     def calculate_heuristic_player(self):
-        self.actualHeuristic[1] = calculateHeuristic(self.state, self.utility, self.heuristic, self.player)[0]
+        self.actualHeuristic[1] = calculateHeuristic(self.state, self.utility, self.heuristic, self.player)
               
         pass
     
     def nextMove(self):
-       self.nextMovement[0] =  np.random.randint(15, size=1)[0] #row
-       self.nextMovement[1] = np.random.randint(15, size=1)[0] #col
+             
+       self.nextMovement =  decideMove()
+       
+  
        if (self.player ==1):
             self.buttons[self.findBt()][0].config(bg='red')
             self.buttons[self.findBt()][0].config(state='disabled', relief=SUNKEN)
@@ -226,18 +230,17 @@ class Game:
             
        self.calculate_heuristic_pc()
        
+       
        return True
+   
     
+    
+        
     def is_valid_move(self):
        if self.state[self.nextMovement[0]][self.nextMovement[1]]== 0:
           return True
        else:
-         return False
-
-   
-          
-    def makeSons(self, x):
-        pass
+         return False    
            
 
     def quit(self):
@@ -245,6 +248,7 @@ class Game:
         root.destroy()
         
     def reset(self,master):
+        print('--------------------')
         self.nextMovement = [0,0]
         self.state= np.zeros((15,15))
         for btn in self.buttons.keys():

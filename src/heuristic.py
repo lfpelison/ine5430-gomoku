@@ -48,6 +48,43 @@ Heuristic = [
 ]
  
 
+def finished(state, heuristicValues, player ):
+    '''          
+         The output is a boolean indicanting if the game finished
+         
+    '''    
+    
+    newState = state.copy() #make a matrix 17 x 17
+    a= np.asarray([[2 for i in range(15)]]).T
+    newState = np.concatenate((a,np.concatenate((newState,a), axis=1)), axis=1).copy()
+    a= np.asarray([[2 for i in range(17)]])
+    newState = np.concatenate((a,np.concatenate((newState,a), axis=0)), axis=0).copy()
+    
+    notFinished = True
+    occurrences=0
+    
+    for values in heuristicValues.keys():
+        
+        
+        
+        sequence = heuristicValues[values][1]
+        #print(values)
+        
+        for seq in sequence:
+            occurrences += searchInList(makeDig(newState, player), seq)
+            occurrences += searchInList(makeCol(newState, player), seq)
+            occurrences += searchInList(makeLin(newState, player), seq)
+            
+           
+        
+        if(values=='numberOfQuintet' and occurrences>0):
+            notFinished= False
+        
+    return notFinished
+
+
+
+
 def calculateHeuristic(state, heuristicValues, positionValuesHeuristic, player ):
     '''  state= numpy matrix of 15x15  with 1's, 0's and -1's meaning the actual 
          state of the game
@@ -74,6 +111,7 @@ def calculateHeuristic(state, heuristicValues, positionValuesHeuristic, player )
     
     notFinished = True
     
+    
     for values in heuristicValues.keys():
         
         
@@ -90,8 +128,7 @@ def calculateHeuristic(state, heuristicValues, positionValuesHeuristic, player )
             #print(occurrences)
            
         sequenceHeuristic += occurrences*ValueSequence
-        if(values=='numberOfQuintet' and occurrences>0):
-            notFinished= False
+        
         
     newState = state.copy() 
     if(player==1):    
@@ -100,11 +137,12 @@ def calculateHeuristic(state, heuristicValues, positionValuesHeuristic, player )
     else:
         np.place(newState, newState==1,0)
         positionHeuristic = -np.sum(np.multiply(newState,positionValuesHeuristic))
-
         
+    #positionHeuristic=0
+    #sequenceHeuristic=0    
      
     HeuristicValue= positionHeuristic + sequenceHeuristic
-    return [HeuristicValue, notFinished]
+    return HeuristicValue
 
     
 def makeDig(matrix, player):
