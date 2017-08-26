@@ -3,6 +3,7 @@ from tkinter import *
 import time
 from tkinter.messagebox import *
 import random
+import heuristic as hr
 
 class Game:
 
