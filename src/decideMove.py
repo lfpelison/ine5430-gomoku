@@ -3,43 +3,61 @@
 
 @author: Andrei
 """
+from random import randint
+from heuristic import *
 
-def decideMove(State, levels=2, PC):
+def decideMove(State, numberOfPC, numberOfPlayer, levels=2):
        nextMovement = [0,0]
-       heuristic,position =  makeSonsPC(State)
-       nextMovement[0],nextMovement[1] = position[np.argmax(heuristic)]
+       print("i'm deciding  the move")
+       nextMovement = applyMinimax(State, numberOfPC, numberOfPlayer, levels)
        return nextMovement
+
     
-def minimax(State, size):
-  levels= list(range(size))
+def applyMinimax(State, numberOfPC, numberOfPlayer, levels):
+
+  listOfHeuristics2= []
+  listOfHeuristics1= []
   
-  allStates = []
-  allMoves = []
-  
-  best_move = moves[0]
-  best_score = float('-inf')
-  for level in levels:
-      if level%2==0: #maximizar a chance do pc ganhar
-          if level== ( len(levels)-1):
+  listOfStates2= []
+  listOfStates1= []
+  listOfStates0= []
+  listOfStates0.append(State)
+
+  listOfStates1.append( makeSons(listOfStates0[0], numberOfPC) )
+  idx = 0 
+  for state1 in listOfStates1[0]: #loop for the first level 
+      print("I'm on the index of state1:" + str(idx) )
+      listOfStates2.append( makeSons(state1, numberOfPlayer) )
+      bestState = listOfStates2[idx][0]
+      bestHeuristic = float('+inf')
+      idx2 = 0 
+      for state2 in listOfStates2[idx]:
+          hr = -calculateHeuristicValue(state2, numberOfPlayer) + calculateHeuristic(state2, numberOfPC)
+          idx2+=1
+          if hr < bestHeuristic:
+              bestHeuristic = hr
+              bestState = state2
               
-          else:
-          
-      else: #minimizar a chance do adversário ganhar
-         if level== ( len(levels)-1):
-              
-         else:
+      listOfHeuristics1.append(bestHeuristic)
+      print("The min heuristic for this state is:" + str(bestHeuristic) )
+      print("--")
+      
+      idx +=1
+      
+  bestState = listOfStates1[0][0]
   
+  bestHeuristic = float('-inf')    
+  for hr in listOfHeuristics1:
+          if hr > bestHeuristic:
+              bestHeuristic = hr
+              bestState = listOfStates1[0][listOfHeuristics1.index(hr)]
   
-  
-  
-  for move in moves:
+  return findMovent(State, bestState, numberOfPC)
     
-    if score > best_score:
-      best_move = move
-      best_score = score
-  return best_move
+    
+
   
-def makeSonsPC(State):
+def makeSons(state, numberToPlayWith):
     
     State= state.copy()
     allStates= []
@@ -48,59 +66,28 @@ def makeSonsPC(State):
         for col in range(len(State[row])):
             if (State[row][col]==0):
                 newState= State.copy()
-                newState[row][col]= self.pc
+                newState[row][col]= numberToPlayWith
                 allStates.append(newState )
-                moves.append([row,col])
                 
-    return allStates, moves
-
-def makeSonsPlayer(State):
-    
-    State= state.copy()
-    allStates= []
-    moves=[]
-     
-    for row in range(len(State)):
-        for col in range(len(State[row])):
-            if (State[row][col]==0):
-                newState= State.copy()
-                newState[row][col]= self.player
-                allStates.append(newState )
-                moves.append([row,col])
                 
-    return allStates, moves
+    return allStates
 
 
-def getMax(State, player ): #Assim não precisamos armazenar o estado das folhas que serão calculadas as heuristicas, calculamos direto aqui e armazenamos
-    
-    State= state.copy()
-    heristicOfStates= []
-    placeOfStates = []
-    
-    for row in range(len(State)):
-        for col in range(len(State[row])):
-            if (State[row][col]==0):
-                newState= State.copy()
-                newState[row][col]= player
-                heristicOfStates.append(calculateHeuristic(newState, self.utility, self.heuristic, player) )
-                placeOfStates.append( [row,col ])
-                
-    return np.argmax(heristicOfStates),placeOfStates[np.argmax(heristicOfStates)] 
+def calculateHeuristicValue(state, player):
+    return calculateHeuristic(state, player)  
 
-def getMin(State, player ):
-    
-    State= state.copy()
-    heristicOfStates= []
-    placeOfStates = []
-    
-    for row in range(len(State)):
-        for col in range(len(State[row])):
-            if (State[row][col]==0):
-                newState= State.copy()
-                newState[row][col]= player
-                heristicOfStates.append(calculateHeuristic(newState, self.utility, self.heuristic, player) )
-                placeOfStates.append( [row,col ])
-    return np.argmin(heristicOfStates), placeOfStates[np.argmin(heristicOfStates)] 
+
+def hasFinished(state, player):
+    return finished(state, player)
+
+
+def findMovent(actualState,nextMove, numberToPlayWith):
+        row, col = np.where( (actualState+nextMove)==numberToPlayWith) 
+        
+        return [row[0], col[0]]
+
+
+
 
 
 

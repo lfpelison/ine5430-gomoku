@@ -1,3 +1,20 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Sun Aug 27 01:25:38 2017
+
+@author: Andrei
+"""
+
+from joblib import Parallel, delayed
+
+def myfun(arg):
+     pass
+     return 1
+
+results = Parallel(n_jobs=-1, backend="threading")(
+             map(delayed(myfun), [1,2]))
+
+
 '''
 Universidade Federal de Santa Catarina
 INE5430 - Inteligencia Artificial
