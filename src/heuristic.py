@@ -26,12 +26,12 @@ Utility = {'numberOfQuintet': [ 200000, ['xxxxx']],
 'numberOfProbTriplet_1Open': [ 40, ['nxexee', 'eexexn']]
 }
 
-Utility = {
-'numberOfDouble_2Opens': [ 500, ['eexxe', 'exxee']],
-'numberOfDouble_1Open': [ 400, ['nxxeee', 'eeexxn']],
-'numberOfProbTriplet_2Opens': [ 100, ['exexe']],
-'numberOfProbTriplet_1Open': [ 40, ['nxexee', 'eexexn']]
-}
+#Utility = {
+#'numberOfDouble_2Opens': [ 500, ['eexxe', 'exxee']],
+#'numberOfDouble_1Open': [ 400, ['nxxeee', 'eeexxn']],
+#'numberOfProbTriplet_2Opens': [ 100, ['exexe']],
+#'numberOfProbTriplet_1Open': [ 40, ['nxexee', 'eexexn']]
+#}
 
 
 

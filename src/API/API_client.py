@@ -15,18 +15,12 @@ state= np.zeros((15,15))
 
 site = "http://api.andreidonati.xyz"
 
-
-response = requests.put(site + "/processmove", data= {"row": -1, "col": 0, "player": 1, "pc":-1} ) #row < 0 means para pc start the game
-#response = requests.put(site + "/reset"    )
-#print(response.content)
+site= "http://35.185.236.57"
 
 
+response = requests.put(site + "/processmove", data= {"row": 6, "col": 7, "player": 1, "pc":-1} ) #row < 0 means para pc start the game
 
 
-
-
-#lista = [1,2,1,-1]
-#
 response = requests.get(site +"/move" )
 
 a= str(response.content)

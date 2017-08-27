@@ -9,19 +9,6 @@ import ast
 #  ps -ef see all process
 #  kill PID -> to kill the background process
  
-#from pymongo import MongoClient
-#musica = {  "_id": 12345,
-#             "nome": "Nothing lef to say",
-#             "banda": "Imagine Dragons",
-#             "categorias": ["indie", "rock"],
-#             "lancamento": datetime.datetime.now()
-#         }
-#
-#
-#cliente = MongoClient('localhost', 27017)
-#banco = cliente.test_database
-
-
 import numpy as np
 
 state = np.zeros((15,15))
@@ -38,21 +25,20 @@ def makePCMove(param, state):
 def put_document():
     return "<h1>Hello World!</h1>"
 
-@route('/lala', method='PUT')
+@route('/kaka', method='PUT')
 def put_document():
     return "<h1>Hello Kaka!</h1>"
     
    
-@route('/makemove/:id', method='GET') # id= [row that player player, col that player played, numofplayer, number of PC ]
-def get_document(id):
+@route('/makemove/:id', method='PUT') # id= [row that player player, col that player played, numofplayer, number of PC ]
+def put_document(id):
     param = ast.literal_eval(id)
     moves = makeClientMove(param)
 	return moves
 
-@route('/reset/:pass', method='GET')
-def get_document(pass): 
-    if pass=22:
-        state = np.zeros((15,15))
+@route('/reset', method='GET')
+def get_document(): 
+    state = np.zeros((15,15))
 	return state
 
  

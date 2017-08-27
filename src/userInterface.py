@@ -241,7 +241,7 @@ class Game:
     def reset(self,master):
         print('--------------------')
         self.nextMovement = [0,0]
-        self.state= np.zeros((15,15))
+        self.state= reset() 
         for btn in self.buttons.keys():
             self.buttons[btn][0].destroy()
         self.createButtons(master)
