@@ -74,9 +74,10 @@ def makeSons(state, numberToPlayWith):
     
     
     allStates= []
+    centerToBorder = np.argsort(abs(np.arange(currState.shape[0])-int(currState.shape[0]/2)))
     
-    for row in range(len(currState)):
-        for col in range(len(currState[row])):
+    for row in centerToBorder:
+        for col in centerToBorder:
             if (proxState[row][col]%3==0 and proxState[row][col]>0):
                 newState= currState.copy()
                 newState[row][col]= numberToPlayWith
@@ -98,10 +99,3 @@ def findMovent(actualState,nextMove, numberToPlayWith):
         row, col = np.where( (actualState+nextMove)==numberToPlayWith) 
         
         return [row[0], col[0]]
-
-
-
-
-
-
-
