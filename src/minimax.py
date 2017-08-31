@@ -13,7 +13,7 @@ import numpy as np
 def decideMove(State, numberOfPC, numberOfPlayer, levels=2):
         nextMovement = [0, 0]
         print("thinking...")
-        nextMovement = applyMinimax(State, numberOfPC, numberOfPlayer, levels)
+        nextMovement = minimax(State, numberOfPC, numberOfPlayer, levels)
         return nextMovement
 
 
@@ -21,7 +21,7 @@ def reset():
     return np.zeros((15, 15))
 
 
-def applyMinimax(State, numberOfPC, numberOfPlayer, levels):
+def minimax(State, numberOfPC, numberOfPlayer, levels):
     listOfHeuristics1 = []
     listOfStates2 = []
     listOfStates1 = []
@@ -37,8 +37,8 @@ def applyMinimax(State, numberOfPC, numberOfPlayer, levels):
         bestHeuristic2 = float('+inf')
         idx2 = 0
         for state2 in listOfStates2[idx]:
-            hr = -calculateHeuristicValue(state2,
-                                          numberOfPlayer) + calculateHeuristic(
+            hr = -calculateHeuristic(state2,
+                                     numberOfPlayer) + calculateHeuristic(
                                                               state2,
                                                               numberOfPC)
             idx2 += 1
@@ -77,10 +77,6 @@ def makeChildren(state, numberToPlayWith):
     return allStates
 
 
-def calculateHeuristicValue(state, player):
-    return calculateHeuristic(state, player)
-
-
-def findMovent(actualState, nextMove, numberToPlayWith):
-        row, col = np.where((actualState + nextMove) == numberToPlayWith)
+def findMovent(currState, nextMove, numberToPlayWith):
+        row, col = np.where((currState + nextMove) == numberToPlayWith)
         return [row[0], col[0]]

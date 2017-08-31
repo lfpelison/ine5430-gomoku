@@ -10,8 +10,8 @@ import tkinter as tk
 from tkinter import messagebox
 import numpy as np
 from functools import partial
-from minimax import decideMove, calculateHeuristicValue, reset
-from heuristic import hasFinished
+from minimax import decideMove, reset
+from heuristic import hasFinished, calculateHeuristic
 
 
 class Game:
@@ -170,11 +170,11 @@ class Game:
                 return b
 
     def calculate_heuristic_pc(self):
-        self.currentHeuristic[0] = calculateHeuristicValue(self.state, self.pc)
+        self.currentHeuristic[0] = calculateHeuristic(self.state, self.pc)
         pass
 
     def calculate_heuristic_player(self):
-        self.currentHeuristic[1] = calculateHeuristicValue(self.state,
+        self.currentHeuristic[1] = calculateHeuristic(self.state,
                                                            self.player)
         pass
 
