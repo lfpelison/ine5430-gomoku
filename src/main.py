@@ -10,7 +10,8 @@ import tkinter as tk
 from tkinter import messagebox
 import numpy as np
 from functools import partial
-from minimax import hasFinished, decideMove, calculateHeuristicValue, reset
+from minimax import decideMove, calculateHeuristicValue, reset
+from heuristic import hasFinished
 
 
 class Game:

@@ -45,7 +45,7 @@ HEURISTIC = [
 [0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0, 0, 0]
 ]
  
-def finished(state, player, heuristicValues=FINISHED):
+def hasFinished(state, player, heuristicValues=FINISHED):
     '''          
          The output is a boolean indicating if the game is finished
          

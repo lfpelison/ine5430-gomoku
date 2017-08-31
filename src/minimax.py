@@ -6,9 +6,8 @@ Authors:
     Igor Yamamoto
     Luis Felipe Pelison
 '''
-from heuristic import finished, calculateHeuristic
+from heuristic import calculateHeuristic
 import numpy as np
-use_api = True
 
 def decideMove(State, numberOfPC, numberOfPlayer, levels=2):
         nextMovement = [0,0]
@@ -17,13 +16,9 @@ def decideMove(State, numberOfPC, numberOfPlayer, levels=2):
         return nextMovement
 
 def reset():
-     #if use_api: 
-         
      return np.zeros((15,15))
-
     
 def applyMinimax(State, numberOfPC, numberOfPlayer, levels):
-    
       listOfHeuristics1= []
       listOfStates2= []
       listOfStates1= []
@@ -31,11 +26,10 @@ def applyMinimax(State, numberOfPC, numberOfPlayer, levels):
       listOfStates0.append(State)
       bestHeuristic1 = float('-inf')
       bestState1 = State
-    
-      listOfStates1.append( makeSons(listOfStates0[0], numberOfPC) )
+      listOfStates1.append( makeChildren(listOfStates0[0], numberOfPC) )
       idx = 0 
       for state1 in listOfStates1[0]: #loop for the first level 
-          listOfStates2.append( makeSons(state1, numberOfPlayer) )
+          listOfStates2.append( makeChildren(state1, numberOfPlayer) )
           bestState2 = listOfStates2[idx][0]
           bestHeuristic2 = float('+inf')
           idx2 = 0 
@@ -56,7 +50,7 @@ def applyMinimax(State, numberOfPC, numberOfPlayer, levels):
           idx +=1         
       return findMovent(State, bestState1, numberOfPC)
     
-def makeSons(state, numberToPlayWith):
+def makeChildren(state, numberToPlayWith):
     currState = state.copy()
     proxState = currState.copy()
     proxMatrix = np.ones((5,5))*3
@@ -76,9 +70,6 @@ def makeSons(state, numberToPlayWith):
 
 def calculateHeuristicValue(state, player):
     return calculateHeuristic(state, player)  
-
-def hasFinished(state, player):
-    return finished(state, player)
 
 def findMovent(actualState,nextMove, numberToPlayWith):
         row, col = np.where( (actualState+nextMove)==numberToPlayWith) 
