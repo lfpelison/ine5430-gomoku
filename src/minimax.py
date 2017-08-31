@@ -1,16 +1,18 @@
-# -*- coding: utf-8 -*-
-"""
-
-@author: Andrei
-"""
-from random import randint
-from heuristic import *
+'''
+Universidade Federal de Santa Catarina
+INE5430 - Inteligencia Artificial
+Authors:
+    Andrei Donati
+    Igor Yamamoto
+    Luis Felipe Pelison
+'''
+from heuristic import finished, calculateHeuristic
 import numpy as np
 use_api = True
 
 def decideMove(State, numberOfPC, numberOfPlayer, levels=2):
         nextMovement = [0,0]
-        print("i'm deciding  the move")    
+        print("thinking...")    
         nextMovement = applyMinimax(State, numberOfPC, numberOfPlayer, levels)
         return nextMovement
 
@@ -22,9 +24,7 @@ def reset():
     
 def applyMinimax(State, numberOfPC, numberOfPlayer, levels):
     
-      listOfHeuristics2= []
       listOfHeuristics1= []
-      
       listOfStates2= []
       listOfStates1= []
       listOfStates0= []
@@ -40,62 +40,46 @@ def applyMinimax(State, numberOfPC, numberOfPlayer, levels):
           bestHeuristic2 = float('+inf')
           idx2 = 0 
           for state2 in listOfStates2[idx]:
-                   
               hr = -calculateHeuristicValue(state2, numberOfPlayer) + calculateHeuristic(state2, numberOfPC)
               idx2+=1
               if hr < bestHeuristic2:
                   bestHeuristic2 = hr
                   bestState2 = state2
-                  
               if bestHeuristic2 > bestHeuristic1:
                   bestHeuristic1 = bestHeuristic2
                   bestState1 = state2
               if idx>0 and bestHeuristic2 < bestHeuristic1: #alpha prune
-                  print('Pruned on iteration ' + str(idx2))
+                  #print('Pruned on iteration ' + str(idx2))
                   break
-                  
           listOfHeuristics1.append(bestHeuristic2)
-          print("idx: " + str(idx) +" - pr:" + str(idx2)+ " - bt hr: "  + str(bestHeuristic1) )
+          #print("idx: " + str(idx) +" - pr:" + str(idx2)+ " - bt hr: "  + str(bestHeuristic1) )
           idx +=1         
-      
       return findMovent(State, bestState1, numberOfPC)
     
-
 def makeSons(state, numberToPlayWith):
-    
     currState = state.copy()
-    
     proxState = currState.copy()
     proxMatrix = np.ones((5,5))*3
     for row in range(currState.shape[0]-4):
         for col in range(currState.shape[1]-4):
             if np.any(currState[row:row+5, col:col+5]):
                 proxState[row:row+5, col:col+5] += proxMatrix
-    
-    
     allStates= []
     centerToBorder = np.argsort(abs(np.arange(currState.shape[0])-int(currState.shape[0]/2)))
-    
     for row in centerToBorder:
         for col in centerToBorder:
             if (proxState[row][col]%3==0 and proxState[row][col]>0):
                 newState= currState.copy()
                 newState[row][col]= numberToPlayWith
                 allStates.append(newState)
-                
-                
     return allStates
-
 
 def calculateHeuristicValue(state, player):
     return calculateHeuristic(state, player)  
 
-
 def hasFinished(state, player):
     return finished(state, player)
 
-
 def findMovent(actualState,nextMove, numberToPlayWith):
         row, col = np.where( (actualState+nextMove)==numberToPlayWith) 
-        
         return [row[0], col[0]]
