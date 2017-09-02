@@ -102,7 +102,7 @@ class Game:
                     self.quitBtn.invoke()
                     return 1
             print('----')
-            print('Wating a move')
+            print('Waiting a move')
         
         elif (self.player == -1 and self.state[self.buttons
                                                [btn][2]][self.buttons
@@ -127,7 +127,7 @@ class Game:
                     self.quitBtn.invoke()
                     return 1
             print('----')
-            print('Wating a move')
+            print('Waiting a move')
 
     def choosePlayer(self):
         '''
@@ -222,6 +222,8 @@ def main():
     root = tk.Tk()
     root.geometry('700x680+250+0')
     root.title('Gomoku Game')
+    img = tk.PhotoImage(file='../img/favicon.png')
+    root.tk.call('wm', 'iconphoto', root._w, img)
     game = Game(root) #Call the class Game
     root.mainloop() #Start the game!
 
