@@ -22,7 +22,6 @@ class Game:
         self.masterParameter = master
         self.createButtons(master)
         self.difficulty = 0
-        self.currentHeuristic = [0, 0]
         self.state = np.zeros((15, 15))
         self.bottomFrame = tk.Frame(root)
         self.bottomFrame.grid(row=15, columnspan=155)
@@ -44,12 +43,14 @@ class Game:
         if(self.player == -1):
             self.pc = 1
             self.nextMove()
-            print('Heuristica PC: ' + str(self.currentHeuristic[0]))
             self.buttons[self.findBt()][0].config(bg='blue')
             self.buttons[self.findBt()][0].config(state='disabled',
                                                   relief=tk.SUNKEN)
             self.state[self.buttons
                        [self.findBt()][2]][self.buttons[self.findBt()][3]] = 1
+            print('----')
+            print('Wating a move')
+
 
     def createButtons(self, parent):
         ##This method creates the graphic interface
@@ -84,8 +85,6 @@ class Game:
             self.buttons[btn][0].config(bg='blue')
             self.buttons[btn][0].config(state='disabled', relief=tk.SUNKEN)
             self.state[self.buttons[btn][2]][self.buttons[btn][3]] = 1
-            self.calculate_heuristic_player()
-            print('Player Heuristics: ' + str(self.currentHeuristic[1]))
             root.update()
             if (self.is_gameover_pc()):
                 if (self.playAgainPlayer() == 1):
@@ -95,7 +94,6 @@ class Game:
                     self.quitBtn.invoke()
                     return 1
             self.nextMove()
-            print('PC Heuristics: ' + str(self.currentHeuristic[0]))
             if (self.is_gameover_player()):
                 if (self.playAgainPC() == 1):
                     self.Reset.invoke()
@@ -103,14 +101,16 @@ class Game:
                 else:
                     self.quitBtn.invoke()
                     return 1
+            print('----')
+            print('Wating a move')
+        
         elif (self.player == -1 and self.state[self.buttons
                                                [btn][2]][self.buttons
                                                          [btn][3]] == 0):
             self.buttons[btn][0].config(bg='red')
             self.buttons[btn][0].config(state='disabled', relief=tk.SUNKEN)
             self.state[self.buttons[btn][2]][self.buttons[btn][3]] = -1
-            self.calculate_heuristic_player()
-            print('Player Heuristics: ' + str(self.currentHeuristic[1]))
+            root.update()
             if (self.is_gameover_pc()):
                 if (self.playAgainPlayer() == 1):
                     self.Reset.invoke()
@@ -119,7 +119,6 @@ class Game:
                     self.quitBtn.invoke()
                     return 1
             self.nextMove()
-            print('PC Heuristics: ' + str(self.currentHeuristic[0]))
             if (self.is_gameover_player()):
                 if (self.playAgainPC() == 1):
                     self.Reset.invoke()
@@ -127,8 +126,13 @@ class Game:
                 else:
                     self.quitBtn.invoke()
                     return 1
+            print('----')
+            print('Wating a move')
 
     def choosePlayer(self):
+        '''
+            Function to choose who play first (PC or Player).
+        '''
         msg = 'Do you want to play first?'
         answer = messagebox.askquestion('Play First', msg)
         if answer == 'yes':
@@ -137,7 +141,7 @@ class Game:
             return -1
 
     def playAgainPlayer(self):
-        msg = 'Congratulations! You won!\n Do you want to play again?'
+        msg = 'Congratulations! You won! Do you want to play again?'
         answer = messagebox.askquestion('Play again', msg)
         if answer == 'yes':
             return 1
@@ -172,15 +176,6 @@ class Game:
                self.buttons[b][3] == self.nextMovement[1]):
                 return b
 
-    def calculate_heuristic_pc(self):
-        self.currentHeuristic[0] = calculateHeuristic(self.state, self.pc)
-        pass
-
-    def calculate_heuristic_player(self):
-        self.currentHeuristic[1] = calculateHeuristic(self.state,
-                                                           self.player)
-        pass
-
     def nextMove(self):
 
         self.nextMovement = decideMove(self.state, self.pc, self.player)
@@ -196,14 +191,8 @@ class Game:
                                                   relief=tk.SUNKEN)
             self.state[self.buttons
                        [self.findBt()][2]][self.buttons[self.findBt()][3]] = 1
-        self.calculate_heuristic_pc()
+       
         return True
-
-    def is_valid_move(self):
-        if self.state[self.nextMovement[0]][self.nextMovement[1]] == 0:
-            return True
-        else:
-            return False
 
     def quit(self):
         global root
@@ -219,20 +208,20 @@ class Game:
         self.player = self.choosePlayer()
         if(self.player == -1):
             self.nextMove()
-            print('Heuristica PC: ' + str(self.currentHeuristic[0]))
             self.buttons[self.findBt()][0].config(bg='blue')
             self.buttons[self.findBt()][0].config(state='disabled',
                                                   relief=tk.SUNKEN)
             self.state[self.buttons
                        [self.findBt()][2]][self.buttons[self.findBt()][3]] = 1
+            print('----')
+            print('Wating a move')
 
 
 def main():
     global root
     root = tk.Tk()
-    root.geometry('840x660+250+0')
+    root.geometry('700x680+250+0')
     root.title('Gomoku Game')
-    #root.iconbitmap("../img/favicon.ico")
     game = Game(root) #Call the class Game
     root.mainloop() #Start the game!
 

@@ -10,10 +10,10 @@ from heuristic import calculateHeuristic
 import numpy as np
 
 
-def decideMove(State, numberOfPC, numberOfPlayer, levels=2):
+def decideMove(State, numberOfPC, numberOfPlayer):
         nextMovement = [0, 0]
-        print("thinking...")
-        nextMovement = minimax(State, numberOfPC, numberOfPlayer, levels)
+        print("I'm deciding  the move. It may take a while! ")    
+        nextMovement = minimax(State, numberOfPC, numberOfPlayer)
         return nextMovement
 
 
@@ -21,7 +21,12 @@ def reset():
     return np.zeros((15, 15))
 
 
-def minimax(State, numberOfPC, numberOfPlayer, levels):
+def minimax(State, numberOfPC, numberOfPlayer):
+    '''
+    Apply the minimax algorith using the heuristic function.
+    
+    Return a array with the row and the column with the best move for the PC
+    '''
     listOfHeuristics1 = []
     listOfStates2 = []
     listOfStates1 = []
@@ -31,16 +36,15 @@ def minimax(State, numberOfPC, numberOfPlayer, levels):
     bestState1 = State
     listOfStates1.append(makeChildren(listOfStates0[0], numberOfPC))
     idx = 0
+    son1 = len(listOfStates1[0])
     for state1 in listOfStates1[0]:  # loop for the first level
         listOfStates2.append(makeChildren(state1, numberOfPlayer))
         bestState2 = listOfStates2[idx][0]
         bestHeuristic2 = float('+inf')
         idx2 = 0
+        son2 = len(listOfStates2[idx])
         for state2 in listOfStates2[idx]:
-            hr = -calculateHeuristic(state2,
-                                     numberOfPlayer) + calculateHeuristic(
-                                                              state2,
-                                                              numberOfPC)
+            hr = -calculateHeuristic(state2, numberOfPlayer) + calculateHeuristic( state2, numberOfPC)
             idx2 += 1
             if hr < bestHeuristic2:
                 bestHeuristic2 = hr
@@ -49,10 +53,9 @@ def minimax(State, numberOfPC, numberOfPlayer, levels):
                 bestHeuristic1 = bestHeuristic2
                 bestState1 = state2
             if idx > 0 and bestHeuristic2 < bestHeuristic1:  # alpha prune
-                # print('Pruned on iteration ' + str(idx2))
                 break
         listOfHeuristics1.append(bestHeuristic2)
-        # print("idx: " + str(idx) +" - pr:" + str(idx2)+" - bt hr: "  + str(bestHeuristic1) )
+        print("Iteration: " + str(idx+1) +"/"+ str(son1) +  " - Pruned at:" + str(idx2)+"/"+ str(son2) )
         idx += 1
     return findMovent(State, bestState1, numberOfPC)
 
@@ -60,11 +63,20 @@ def minimax(State, numberOfPC, numberOfPlayer, levels):
 def makeChildren(state, numberToPlayWith):
     currState = state.copy()
     proxState = currState.copy()
-    proxMatrix = np.ones((5, 5))*3
-    for row in range(currState.shape[0]-4):
-        for col in range(currState.shape[1]-4):
-            if np.any(currState[row:row+5, col:col+5]):
-                proxState[row:row+5, col:col+5] += proxMatrix
+    temp = np.count_nonzero(proxState)
+    if ( temp>1 ):
+        proxMatrix = np.ones((5, 5))*3
+        for row in range(currState.shape[0]-4):
+            for col in range(currState.shape[1]-4):
+                if np.any(currState[row:row+5, col:col+5]):
+                    proxState[row:row+5, col:col+5] += proxMatrix
+    elif temp==1 and currState[7][7]==0 : 
+        proxState[7,7]= 3
+    elif temp==1 and currState[7][7]!=0 : 
+        proxState[6,6]= 3
+    elif temp==0 : 
+        proxState[7,7]= 3
+        
     allStates = []
     diffToCenter = abs(np.arange(len(currState)) - int(len(currState)/2))
     centerToBorder = np.argsort(diffToCenter)
