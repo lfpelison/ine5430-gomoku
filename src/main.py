@@ -6,15 +6,18 @@ Authors:
     Igor Yamamoto
     Luis Felipe Pelison
 '''
+#Other libs
 import tkinter as tk
 from tkinter import messagebox
 import numpy as np
 from functools import partial
+#Our libs
 from minimax import decideMove, reset
 from heuristic import hasFinished, calculateHeuristic
 
 
 class Game:
+    #The main class! This have all the attibutes and methods to the game works!
     def __init__(self, master):
         self.masterParameter = master
         self.createButtons(master)
@@ -49,6 +52,7 @@ class Game:
                        [self.findBt()][2]][self.buttons[self.findBt()][3]] = 1
 
     def createButtons(self, parent):
+        ##This method creates the graphic interface
         self.buttons = {}
         row = 0
         col = 0
@@ -81,7 +85,7 @@ class Game:
             self.buttons[btn][0].config(state='disabled', relief=tk.SUNKEN)
             self.state[self.buttons[btn][2]][self.buttons[btn][3]] = 1
             self.calculate_heuristic_player()
-            print('Heuristica Player: ' + str(self.currentHeuristic[1]))
+            print('Player Heuristics: ' + str(self.currentHeuristic[1]))
             root.update()
             if (self.is_gameover_pc()):
                 if (self.playAgainPlayer() == 1):
@@ -91,7 +95,7 @@ class Game:
                     self.quitBtn.invoke()
                     return 1
             self.nextMove()
-            print('Heuristica PC: ' + str(self.currentHeuristic[0]))
+            print('PC Heuristics: ' + str(self.currentHeuristic[0]))
             if (self.is_gameover_player()):
                 if (self.playAgainPC() == 1):
                     self.Reset.invoke()
@@ -106,7 +110,7 @@ class Game:
             self.buttons[btn][0].config(state='disabled', relief=tk.SUNKEN)
             self.state[self.buttons[btn][2]][self.buttons[btn][3]] = -1
             self.calculate_heuristic_player()
-            print('Heuristica Player: ' + str(self.currentHeuristic[1]))
+            print('Player Heuristics: ' + str(self.currentHeuristic[1]))
             if (self.is_gameover_pc()):
                 if (self.playAgainPlayer() == 1):
                     self.Reset.invoke()
@@ -115,7 +119,7 @@ class Game:
                     self.quitBtn.invoke()
                     return 1
             self.nextMove()
-            print('Heuristica PC: ' + str(self.currentHeuristic[0]))
+            print('PC Heuristics: ' + str(self.currentHeuristic[0]))
             if (self.is_gameover_player()):
                 if (self.playAgainPC() == 1):
                     self.Reset.invoke()
@@ -133,7 +137,7 @@ class Game:
             return -1
 
     def playAgainPlayer(self):
-        msg = 'Congratulations! You win!\n Do you want to play again?'
+        msg = 'Congratulations! You won!\n Do you want to play again?'
         answer = messagebox.askquestion('Play again', msg)
         if answer == 'yes':
             return 1
@@ -158,7 +162,6 @@ class Game:
     def is_gameover_player(self):
         # A board is terminal if it is won or there are no empty spaces.
         if (0 in self.state and hasFinished(self.state, self.pc)):
-
             return False
         else:
             return True
@@ -227,11 +230,11 @@ class Game:
 def main():
     global root
     root = tk.Tk()
-    root.geometry('580x680+250+0')
+    root.geometry('840x660+250+0')
     root.title('Gomoku Game')
-    root.iconbitmap("../img/favicon.ico")
-    game = Game(root)
-    root.mainloop()
+    #root.iconbitmap("../img/favicon.ico")
+    game = Game(root) #Call the class Game
+    root.mainloop() #Start the game!
 
 
 if __name__ == '__main__':

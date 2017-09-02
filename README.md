@@ -17,4 +17,4 @@ Instruções de uso:
 - cd ine5430-gomoku/
 - pip install -r requirements.txt
 - cd src/
-- python3 gomoku.py
+- python3 main.py
