@@ -6,24 +6,13 @@ Authors:
     Igor Yamamoto
     Luis Felipe Pelison
 '''
-# Other libs
 import tkinter as tk
 from tkinter import messagebox
 import numpy as np
 from functools import partial
-# Our libs
+
 from minimax import minimax
-from heuristic import hasFinished, calculateHeuristic
-
-
-def decideMove(state, pcNumber, playerNumber):
-        nextMove = [0, 0]
-        print("I'm deciding  the move. It may take a while! ")    
-        nextMove = minimax(state)
-        return nextMove
-    
-def reset():
-    return np.zeros((15, 15))
+from heuristic import hasWinnerSeq, calculateHeuristic
 
 
 class State(object):
@@ -32,14 +21,13 @@ class State(object):
         Game state (graph nodes).
     Attributes:
         board: numpy 2D array.
-        player: 1 (player one) or -1 (player two).
-        heuristic_val: number calculated from heuristics.
+        player: next player to make a move. 1 (player one) or -1 (player two).
+    Properties:
+        heuristic_value: number calculated from heuristics.
+        available_moves: all possible moves, given the board configuration.
     Methods:
-        get_available_moves: returns all possible moves, given a board configuration.
-        is_valid_move: verify if the move is valid.
-        is_gameover: verify if the state is terminal.
-        calculate_heuristic: returns a numeric value from heuristic function.
-        next_state: returns the next state, from the state itself and a move.
+        is_terminal: verify if the state is terminal.
+        next_state: returns the next state, given the state itself and a move.
     '''
     def __init__(self, board, player):
         self.board = board
@@ -50,7 +38,8 @@ class State(object):
         self._heuristic_value = calculateHeuristic(self.board, self.player)
         return self._heuristic_value
     
-    def get_available_moves(self):
+    @property
+    def available_moves(self):
         height = self.board.shape[0]
         width = self.board.shape[1]
         proximityBoard = self.board.copy()
@@ -69,7 +58,7 @@ class State(object):
         elif temp == 0: 
             proximityBoard[int(height/2), int(width/2)] = 3
             
-        availableMoves = []
+        self._available_moves = []
         diffToCenterHeight = abs(np.arange(height) - int(height/2))
         centerToBorderHeight = np.argsort(diffToCenterHeight)
         diffToCenterWidth = abs(np.arange(width) - int(width/2))
@@ -78,56 +67,76 @@ class State(object):
             for col in centerToBorderWidth:
                 if (proximityBoard[row][col] % 3 == 0 and proximityBoard[row][col] > 0):
                     move = (row, col)
-                    availableMoves.append(move)
-        return availableMoves
+                    self._available_moves.append(move)
+        return self._available_moves
     
     def is_terminal(self):
         # A board is terminal if it is won or there are no empty spaces.
-        return hasFinished(self.board, self.player)
+        if not (0 in self.board):
+            return True
+        if hasWinnerSeq(self.board, -1*self.player):
+            return True
+        else:
+            return False
     
     def next_state(self, move):
         next_board = np.copy(self.board)
         next_board[move] = self.player
         next_player = -1*self.player
         return State(next_board, next_player)
-    
-   
+
+
 class Game:
-    #The main class! This have all the attibutes and methods to the game works!
-    def __init__(self, master):
-        self.masterParameter = master
-        self.createButtons(master)
-        self.difficulty = 0
-        self.state = np.zeros((15, 15))
-        self.bottomFrame = tk.Frame(root)
+    '''
+    Class description: 
+        Game controller. It stores the current state of the game, displays the
+        board and it implements the game actions to play.
+    '''
+    def __init__(self, height=15, width=15):
+        self.root = tk.Tk()
+        self.root.geometry('700x680+250+0')
+        self.root.title('Gomoku Game')
+        img = tk.PhotoImage(file='../img/favicon.png')
+        self.root.tk.call('wm', 'iconphoto', self.root._w, img)
+        self.bottomFrame = tk.Frame(self.root)
         self.bottomFrame.grid(row=15, columnspan=155)
         self.quitBtn = tk.Button(self.bottomFrame,
                                  text='Quit',
                                  command=self.quit)
         self.quitBtn.grid(row=18, columnspan=5)
-        reset_with_arg = partial(self.reset, master)
+        reset_with_arg = partial(self.reset, self.root)
         self.Reset = tk.Button(self.bottomFrame,
                                text='Reset Game',
                                command=reset_with_arg)
         self.Reset.grid(row=19, columnspan=5)
+        self.createButtons(self.root)
         self.btn = tk.Button(self.bottomFrame, text='My text')
         self.btn.config(state='disabled', relief=tk.SUNKEN)
-        self.heuristic_val = 0
-        self.nextMovement = [0, 0]
-        self.player = self.choosePlayer()
-        self.pc = -1
-        if(self.player == -1):
-            self.pc = 1
-            self.nextMove()
-            self.buttons[self.findBt()][0].config(bg='blue')
-            self.buttons[self.findBt()][0].config(state='disabled',
-                                                  relief=tk.SUNKEN)
-            self.state[self.buttons
-                       [self.findBt()][2]][self.buttons[self.findBt()][3]] = 1
-            print('----')
-            print('Wating a move')
+        self.height = height
+        self.width = width
+        initial_board = np.zeros((height, width))
+        player_one = 1
+        self.current_state = State(initial_board, player_one)
+        self.isPlayerOneHuman = self.isHuman('One')
+        self.isPlayerTwoHuman = self.isHuman('Two')
+        if not self.isPlayerOneHuman and self.current_state == 1:
+            self.PCMove()
+        
 
-
+    def PCMove(self):
+        print('pc')
+        move = minimax(self.current_state)
+        print(move)
+        btn = self.buttons[self.findBt(move)][0]
+        if (self.current_state.player == 1):
+            btn.config(bg='black')
+            btn.config(state='disabled', relief=tk.SUNKEN)
+        else:
+            btn.config(bg='white')
+            btn.config(state='disabled', relief=tk.SUNKEN)
+        self.current_state = self.current_state.next_state(move)
+        self.root.update()
+    
     def createButtons(self, parent):
         ##This method creates the graphic interface
         self.buttons = {}
@@ -136,9 +145,9 @@ class Game:
         for x in range(0, 15*15):
             id = str(row) + '-' + str(col)
             self.buttons[x] = [tk.Button(parent,
-                                         bg='#8a8a8a',
+                                         bg='#ecab57',
                                          height=2,
-                                         width=4),
+                                         width=2),
                                id,  # player
                                row,
                                col]
@@ -155,21 +164,21 @@ class Game:
         return lambda Button: self.leftClick(x)
 
     def leftClick(self, btn):
-        if (self.player == 1 and self.state[self.buttons
-                                            [btn][2]][self.buttons
-                                                      [btn][3]] == 0):
-            self.buttons[btn][0].config(bg='blue')
+        if (self.current_state.player == 1 and self.current_state.board[self.buttons
+                                                                        [btn][2]][self.buttons
+                                                                        [btn][3]] == 0):
+            self.buttons[btn][0].config(bg='black')
             self.buttons[btn][0].config(state='disabled', relief=tk.SUNKEN)
             self.state[self.buttons[btn][2]][self.buttons[btn][3]] = 1
-            root.update()
-            if (self.is_gameover_pc()):
-                if (self.playAgainPlayer() == 1):
+            self.root.update()
+            if (self.is_gameover()):
+                if self.playAgain('One'):
                     self.Reset.invoke()
                     return 1
                 else:
                     self.quitBtn.invoke()
                     return 1
-            self.nextMove()
+            self.PCMove()
             if (self.is_gameover_player()):
                 if (self.playAgainPC() == 1):
                     self.Reset.invoke()
@@ -186,7 +195,7 @@ class Game:
             self.buttons[btn][0].config(bg='red')
             self.buttons[btn][0].config(state='disabled', relief=tk.SUNKEN)
             self.state[self.buttons[btn][2]][self.buttons[btn][3]] = -1
-            root.update()
+            self.root.update()
             if (self.is_gameover_pc()):
                 if (self.playAgainPlayer() == 1):
                     self.Reset.invoke()
@@ -204,83 +213,39 @@ class Game:
                     return 1
             print('----')
             print('Waiting a move')
-
-    def choosePlayer(self):
+            
+    def isHuman(self, number):
         '''
-            Function to choose who play first (PC or Player).
+            Function to choose wether the player is human or not.
         '''
-        msg = 'Do you want to play first?'
-        answer = messagebox.askquestion('Play First', msg)
-        if answer == 'yes':
-            return 1
-        else:
-            return -1
+        msg = 'Is Player {} a human?'.format(number)
+        return messagebox.askyesno('Human or PC', msg)
+    
+    def playAgain(self, number):
+        msg = 'Player {} is the winner! \nDo you want to play again?'.format(number)
+        return messagebox.askyesno('Play again', msg)
 
-    def playAgainPlayer(self):
-        msg = 'Congratulations! You won! Do you want to play again?'
-        answer = messagebox.askquestion('Play again', msg)
-        if answer == 'yes':
-            return 1
-        else:
-            return -1
-
-    def playAgainPC(self):
-        msg = ':-( You lose!\nDo you want to play again?'
-        answer = messagebox.askquestion('Play again', msg)
-        if answer == 'yes':
-            return 1
-        else:
-            return -1
-
-    def is_gameover_pc(self):
+    def is_gameover(self):
         # A board is terminal if it is won or there are no empty spaces.
-        if (0 in self.state and hasFinished(self.state, self.player)):
-            return False
-        else:
-            return True
+        return self.current_state.is_terminal()
 
-    def is_gameover_player(self):
-        # A board is terminal if it is won or there are no empty spaces.
-        if (0 in self.state and hasFinished(self.state, self.pc)):
-            return False
-        else:
-            return True
-
-    def findBt(self):
+    def findBt(self, move):
         for b in self.buttons.keys():
-            if (self.buttons[b][2] == self.nextMovement[0] and
-               self.buttons[b][3] == self.nextMovement[1]):
+            if (self.buttons[b][2] == move[0] and
+               self.buttons[b][3] == move[1]):
                 return b
 
-    def nextMove(self):
-
-        self.nextMovement = decideMove(self.state, self.pc, self.player)
-        if (self.player == 1):
-            self.buttons[self.findBt()][0].config(bg='red')
-            self.buttons[self.findBt()][0].config(state='disabled',
-                                                  relief=tk.SUNKEN)
-            self.state[self.buttons
-                       [self.findBt()][2]][self.buttons[self.findBt()][3]] = -1
-        else:
-            self.buttons[self.findBt()][0].config(bg='blue')
-            self.buttons[self.findBt()][0].config(state='disabled',
-                                                  relief=tk.SUNKEN)
-            self.state[self.buttons
-                       [self.findBt()][2]][self.buttons[self.findBt()][3]] = 1
-       
-        return True
-
     def quit(self):
-        global root
-        root.destroy()
+        self.root.destroy()
 
-    def reset(self, master):
+    def reset(self):
         print('--------------------')
-        self.nextMovement = [0, 0]
-        self.state = reset()
+        initial_board = np.zeros((self.height, self.width))
+        player_one = 1
+        self.current_state = State(initial_board, player_one)
         for btn in self.buttons.keys():
             self.buttons[btn][0].destroy()
-        self.createButtons(master)
+        self.createButtons(self.root)
         self.player = self.choosePlayer()
         if(self.player == -1):
             self.nextMove()
@@ -291,18 +256,10 @@ class Game:
                        [self.findBt()][2]][self.buttons[self.findBt()][3]] = 1
             print('----')
             print('Wating a move')
-
-
-def main():
-    global root
-    root = tk.Tk()
-    root.geometry('700x680+250+0')
-    root.title('Gomoku Game')
-    img = tk.PhotoImage(file='../img/favicon.png')
-    root.tk.call('wm', 'iconphoto', root._w, img)
-    game = Game(root) #Call the class Game
-    root.mainloop() #Start the game!
-
+            
+    def run(self):
+        self.root.mainloop()
 
 if __name__ == '__main__':
-    main()
+    gomoku = Game()
+    gomoku.run()

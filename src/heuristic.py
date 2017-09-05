@@ -12,20 +12,20 @@ import numpy as np
 import regex as re
 
 
-UTILITY = {'numberOfQuintet': [200000, ['xxxxx']],
-           'numberOfQuartet_2Opens': [120000, ['exxxxe']],
-           'numberOfQuartet_1Open': [50000, ['nxxxxe', 'exxxxn']],
-           'numberOfTriplet_2Opens': [30000, ['exxxe']],
-           'numberOfTriplet_1Open': [15000, ['nxxxee', 'eexxxn']],
-           'numberOfProbQuartet_2Opens': [7000, ['exexxe', 'exxexe']],
-           'numberOfProbQuartet_1Open': [3000, ['nxexxe',
+UTILITY = {'Quintet': [200000, ['xxxxx']],
+           'Quartet_2Opens': [120000, ['exxxxe']],
+           'Quartet_1Open': [50000, ['nxxxxe', 'exxxxn']],
+           'Triplet_2Opens': [30000, ['exxxe']],
+           'Triplet_1Open': [15000, ['nxxxee', 'eexxxn']],
+           'ProbQuartet_2Opens': [7000, ['exexxe', 'exxexe']],
+           'ProbQuartet_1Open': [3000, ['nxexxe',
                                                 'nxxexe', 'exxexn', 'exexxn']],
-           'numberOfDouble_2Opens': [500, ['eexxe', 'exxee']],
-           'numberOfDouble_1Open': [400, ['nxxeee', 'eeexxn']],
-           'numberOfProbTriplet_2Opens': [100, ['exexe']],
-           'numberOfProbTriplet_1Open': [40, ['nxexee', 'eexexn']]}
+           'Double_2Opens': [500, ['eexxe', 'exxee']],
+           'Double_1Open': [400, ['nxxeee', 'eeexxn']],
+           'nProbTriplet_2Opens': [100, ['exexe']],
+           'ProbTriplet_1Open': [40, ['nxexee', 'eexexn']]}
 
-FINISHED = {'numberOfQuintet': [200000, ['xxxxx']]}
+FINISHED = {'Quintet': [200000, ['xxxxx']]}
 
 HEURISTIC = [[0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0, 0, 0],
              [0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0, 0, 0],
@@ -44,30 +44,26 @@ HEURISTIC = [[0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0, 0, 0],
              [0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0, 0, 0]]
 
 
-def hasFinished(board, player, heuristicValues=FINISHED):
+def hasWinnerSeq(board, lastPlayer, winnerSeq='xxxxx'):
     '''
-         The output is a boolean indicating if the game is finished
+         The output is a boolean indicating if the board has a winner sequence.
 
     '''
-    newBoard = board.copy()  # make a 17 x 17 matrix
+    newBoard = board.copy()
     a = np.asarray([[2 for i in range(15)]]).T
     newBoard = np.concatenate((a, np.concatenate((newBoard, a), axis=1)),
                               axis=1).copy()
     a = np.asarray([[2 for i in range(17)]])
     newBoard = np.concatenate((a, np.concatenate((newBoard, a), axis=0)),
                               axis=0).copy()
-
-    notFinished = True
-    occurrences = 0
-    for values in heuristicValues.keys():
-        sequence = heuristicValues[values][1]
-        for seq in sequence:
-            occurrences += searchInList(makeDig(newBoard, player), seq)
-            occurrences += searchInList(makeCol(newBoard, player), seq)
-            occurrences += searchInList(makeLin(newBoard, player), seq)
-        if(values == 'numberOfQuintet' and occurrences > 0):
-            notFinished = False
-        return notFinished
+    count = 0
+    count += searchInList(makeDig(newBoard, lastPlayer), winnerSeq)
+    count += searchInList(makeCol(newBoard, lastPlayer), winnerSeq)
+    count += searchInList(makeLin(newBoard, lastPlayer), winnerSeq)
+    if count > 0:
+        return True
+    else:
+        return False
 
 
 def calculateHeuristic(board,
@@ -90,7 +86,7 @@ def calculateHeuristic(board,
     '''    
     sequenceHeuristic = 0
     positionHeuristic = 0
-    newBoard = board.copy()  # make a matrix 17 x 17
+    newBoard = board.copy()
     a = np.asarray([[2 for i in range(15)]]).T
     newBoard = np.concatenate((a, np.concatenate((newBoard, a), axis=1)),
                               axis=1).copy()
@@ -99,13 +95,13 @@ def calculateHeuristic(board,
                               axis=0).copy()
     for values in heuristicValues.keys():
         ValueSequence = heuristicValues[values][0]
-        occurrences = 0
+        count = 0
         sequence = heuristicValues[values][1]
         for seq in sequence:
-            occurrences += searchInList(makeDig(newBoard, player), seq)
-            occurrences += searchInList(makeCol(newBoard, player), seq)
-            occurrences += searchInList(makeLin(newBoard, player), seq)
-        sequenceHeuristic += occurrences*ValueSequence
+            count += searchInList(makeDig(newBoard, player), seq)
+            count += searchInList(makeCol(newBoard, player), seq)
+            count += searchInList(makeLin(newBoard, player), seq)
+        sequenceHeuristic += count*ValueSequence
     newBoard = board.copy()
     if(player == 1):
         np.place(newBoard, newBoard == -1, 0)
@@ -225,10 +221,10 @@ def searchInList(Lists, searchFor):
     List: a list of lists with string values
     seachFor: string to search for
     '''
-    occurrences = 0
+    count = 0
     for List in Lists:
-        occurrences += countOccurrences(List, searchFor)
-    return occurrences
+        count += countOccurrences(List, searchFor)
+    return count
 
 
 def countOccurrences(text, searchFor):
