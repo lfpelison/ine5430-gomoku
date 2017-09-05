@@ -43,7 +43,7 @@ class State(object):
         height = self.board.shape[0]
         width = self.board.shape[1]
         proximityBoard = self.board.copy()
-        radius = 5
+        radius = 2
         proximityMatrix = np.ones((radius, radius))*3
         temp = np.count_nonzero(proximityBoard)
         if (temp > 1):
@@ -136,6 +136,8 @@ class Game:
             btn.config(state='disabled', relief=tk.SUNKEN)
         self.current_state = self.current_state.next_state(move)
         self.root.update()
+        print('----')
+        print('Wating a move')
     
     def createButtons(self, parent):
         ##This method creates the graphic interface
@@ -169,7 +171,7 @@ class Game:
                                                                         [btn][3]] == 0):
             self.buttons[btn][0].config(bg='black')
             self.buttons[btn][0].config(state='disabled', relief=tk.SUNKEN)
-            self.state[self.buttons[btn][2]][self.buttons[btn][3]] = 1
+            self.current_state.board[self.buttons[btn][2]][self.buttons[btn][3]] = 1
             self.root.update()
             if (self.is_gameover()):
                 if self.playAgain('One'):
@@ -179,8 +181,8 @@ class Game:
                     self.quitBtn.invoke()
                     return 1
             self.PCMove()
-            if (self.is_gameover_player()):
-                if (self.playAgainPC() == 1):
+            if (self.is_gameover('One')):
+                if self.playAgain():
                     self.Reset.invoke()
                     return 1
                 else:
@@ -189,12 +191,12 @@ class Game:
             print('----')
             print('Waiting a move')
         
-        elif (self.player == -1 and self.state[self.buttons
-                                               [btn][2]][self.buttons
-                                                         [btn][3]] == 0):
-            self.buttons[btn][0].config(bg='red')
+        elif (self.current_state.player == -1 and self.current_state.board[self.buttons
+                                                                        [btn][2]][self.buttons
+                                                                        [btn][3]] == 0):
+            self.buttons[btn][0].config(bg='white')
             self.buttons[btn][0].config(state='disabled', relief=tk.SUNKEN)
-            self.state[self.buttons[btn][2]][self.buttons[btn][3]] = -1
+            self.current_state.board[self.buttons[btn][2]][self.buttons[btn][3]] = -1
             self.root.update()
             if (self.is_gameover_pc()):
                 if (self.playAgainPlayer() == 1):

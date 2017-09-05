@@ -112,7 +112,43 @@ def calculateHeuristic(board,
         positionHeuristic = -np.sum(np.multiply(newBoard,
                                                 positionValuesHeuristic))
     HeuristicValue = positionHeuristic + sequenceHeuristic
-    return HeuristicValue
+    
+    total = HeuristicValue
+    
+    
+    
+    
+    
+    player = -1*player
+    sequenceHeuristic = 0
+    positionHeuristic = 0
+    newBoard = board.copy()
+    a = np.asarray([[2 for i in range(15)]]).T
+    newBoard = np.concatenate((a, np.concatenate((newBoard, a), axis=1)),
+                              axis=1).copy()
+    a = np.asarray([[2 for i in range(17)]])
+    newBoard = np.concatenate((a, np.concatenate((newBoard, a), axis=0)),
+                              axis=0).copy()
+    for values in heuristicValues.keys():
+        ValueSequence = heuristicValues[values][0]
+        count = 0
+        sequence = heuristicValues[values][1]
+        for seq in sequence:
+            count += searchInList(makeDig(newBoard, player), seq)
+            count += searchInList(makeCol(newBoard, player), seq)
+            count += searchInList(makeLin(newBoard, player), seq)
+        sequenceHeuristic += count*ValueSequence
+    newBoard = board.copy()
+    if(player == 1):
+        np.place(newBoard, newBoard == -1, 0)
+        positionHeuristic = np.sum(np.multiply(newBoard,
+                                               positionValuesHeuristic))
+    else:
+        np.place(newBoard, newBoard == 1, 0)
+        positionHeuristic = -np.sum(np.multiply(newBoard,
+                                                positionValuesHeuristic))
+    HeuristicValue = positionHeuristic + sequenceHeuristic
+    return total - HeuristicValue
 
 
 def makeDig(matrix, player):
