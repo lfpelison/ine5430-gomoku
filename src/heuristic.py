@@ -12,8 +12,8 @@ import numpy as np
 import regex as re
 
 
-UTILITY = {'Quintet': [200000, ['xxxxx']],
-           'Quartet_2Opens': [120000, ['exxxxe']],
+UTILITY = {'Quintet': [2000000, ['xxxxx']],
+           'Quartet_2Opens': [400000, ['exxxxe']],
            'Quartet_1Open': [50000, ['nxxxxe', 'exxxxn']],
            'Triplet_2Opens': [30000, ['exxxe']],
            'Triplet_1Open': [15000, ['nxxxee', 'eexxxn']],
@@ -44,6 +44,7 @@ HEURISTIC = [[0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0, 0, 0],
              [0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0, 0, 0]]
 
 
+#|21th.|
 def hasWinnerSeq(board, lastPlayer, winnerSeq='xxxxx'):
     '''
          The output is a boolean indicating if the board has a winner sequence.
@@ -66,24 +67,25 @@ def hasWinnerSeq(board, lastPlayer, winnerSeq='xxxxx'):
         return False
 
 
+#|10th.|
 def calculateHeuristic(board,
                        player,
                        heuristicValues=UTILITY,
                        positionValuesHeuristic=HEURISTIC):
-    '''  
+    '''
          This function calculates the heuristic of sosme move
-         board= numpy matrix of 15x15  with 1's, 0's and -1's meaning the actual 
+         board= numpy matrix of 15x15  with 1's, 0's and -1's meaning the actual
          board of the game
          heuristicValues =  dict with keys with the type of heuristc
          we are searching for.
          positionValuesHeuristic = numpy matrix with same dimension of board
-         matrix, with the values for heuristic of the pieces positions 
-         number_to_play_with= -1 or 1, depeding if we are calculating the pc heuristic or the player heuristic 
+         matrix, with the values for heuristic of the pieces positions
+         number_to_play_with= -1 or 1, depeding if we are calculating the pc heuristic or the player heuristic
          pc_number = 1 ot -1, value that the pc are playing
-         
+
          The output is a integer with the value of a heuristc of the board.
-         
-    '''    
+
+    '''
     sequenceHeuristic = 0
     positionHeuristic = 0
     newBoard = board.copy()
@@ -112,13 +114,13 @@ def calculateHeuristic(board,
         positionHeuristic = -np.sum(np.multiply(newBoard,
                                                 positionValuesHeuristic))
     HeuristicValue = positionHeuristic + sequenceHeuristic
-    
+
     total = HeuristicValue
-    
-    
-    
-    
-    
+
+
+
+
+
     player = -1*player
     sequenceHeuristic = 0
     positionHeuristic = 0
@@ -151,6 +153,7 @@ def calculateHeuristic(board,
     return total - 1.1*HeuristicValue
 
 
+#|11th.|
 def makeDig(matrix, player):
     '''
          Make a vector with the diagonals of the matrix
@@ -199,6 +202,7 @@ def makeDig(matrix, player):
     return diagonal
 
 
+#|15th.|
 def makeLin(matrix, player):
     '''
          Make a vector with the collumns of the matrix
@@ -225,6 +229,7 @@ def makeLin(matrix, player):
     return diagonal
 
 
+#|14th.|
 def makeCol(matrix, player):
     '''
         Make a vector with the lines of the matrix
@@ -252,6 +257,7 @@ def makeCol(matrix, player):
     return diagonal
 
 
+#|12th.|
 def searchInList(Lists, searchFor):
     '''
     List: a list of lists with string values
@@ -263,6 +269,7 @@ def searchInList(Lists, searchFor):
     return count
 
 
+#|13th.|
 def countOccurrences(text, searchFor):
     '''
         Count all occurrences of the string "searchFor" in the text "text"

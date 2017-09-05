@@ -6,6 +6,8 @@ Authors:
     Igor Yamamoto
     Luis Felipe Pelison
 '''
+
+#|7th.|
 def minimax(state, depth=2):
     '''
         Minimax algorithm
@@ -16,10 +18,10 @@ def minimax(state, depth=2):
             return state.heuristic_value
         node_value = float('-inf')
         for i, move in enumerate(state.available_moves):
-            node_value = max(node_value, min_play(state.next_state(move), 
+            node_value = max(node_value, min_play(state.next_state(move),
                                                   alpha, beta, d+1))
             if node_value >= beta:
-                print('val:{} move:{}'.format(node_value, move))
+                #print('val:{} move:{}'.format(node_value, move))
                 return node_value
             alpha = max(alpha, node_value)
         # print('didnt pruned')
@@ -30,15 +32,15 @@ def minimax(state, depth=2):
             return state.heuristic_value
         node_value = float('inf')
         for i, move in enumerate(state.available_moves):
-            node_value = min(node_value, max_play(state.next_state(move), 
+            node_value = min(node_value, max_play(state.next_state(move),
                                                   alpha, beta, d+1))
             if node_value <= alpha:
-                print('val:{} move:{}'.format(node_value, move))
+                #print('val:{} move:{}'.format(node_value, move))
                 return node_value
             beta = min(beta, node_value)
         # print('didnt pruned')
         return node_value
-    
+
     alpha = float('-inf')
     beta = float('inf')
     node_value = float('-inf')
@@ -51,4 +53,3 @@ def minimax(state, depth=2):
             next_move = move
         alpha = max(alpha, node_value)
     return next_move
-      
