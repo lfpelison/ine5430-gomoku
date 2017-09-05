@@ -6,43 +6,50 @@ Authors:
     Igor Yamamoto
     Luis Felipe Pelison
 '''
-def minimax(state, depth=0):
+import numpy as np
+def minimax(state, depth=2):
     '''
         Minimax algorithm
     '''
 
     def max_play(state, alpha, beta, d):
-        if state.is_terminal() or d > depth:
+        if state.is_terminal() or d >= depth:
             return state.heuristic_value
         node_value = float('-inf')
-        for move in state.available_moves:
+        for i, move in enumerate(state.available_moves):
             node_value = max(node_value, min_play(state.next_state(move), 
                                                   alpha, beta, d+1))
             if node_value >= beta:
-                print('pruned on max')
+                # print('pruned at {}/{}'.format(i, len(state.available_moves)))
                 return node_value
             alpha = max(alpha, node_value)
-        print('return from {}'.format(d))
+        # print('didnt pruned')
         return node_value
 
     def min_play(state, alpha, beta, d):
-        if state.is_terminal() or d > depth:
+        if state.is_terminal() or d >= depth:
             return state.heuristic_value
         node_value = float('inf')
-        for move in state.available_moves:
+        for i, move in enumerate(state.available_moves):
             node_value = min(node_value, max_play(state.next_state(move), 
                                                   alpha, beta, d+1))
             if node_value <= alpha:
-                print('pruned on min')
+                # print('pruned at {}/{}'.format(i, len(state.available_moves)))
                 return node_value
             beta = min(beta, node_value)
-        print('return from {}'.format(d))
+        # print('didnt pruned')
         return node_value
     
-    firstLayer = map(lambda move: (move, min_play(state.next_state(move), 
-                                                  float('-inf'), 
-                                                  float('inf'), 0)), 
-                     state.available_moves)
-    move = max(firstLayer, key=lambda x: x[1])[0]
-    return move
+    alpha = float('-inf')
+    beta = float('inf')
+    node_value = float('-inf')
+    next_move = state.available_moves[0]
+    for i, move in enumerate(state.available_moves):
+        neighbor_value = min_play(state.next_state(move), alpha, beta, 1)
+        # print('child {}/{}: '.format(i, len(state.available_moves)))
+        if neighbor_value > node_value:
+            node_value = neighbor_value
+            next_move = move
+        alpha = max(alpha, node_value)
+    return next_move
       

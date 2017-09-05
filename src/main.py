@@ -43,7 +43,7 @@ class State(object):
         height = self.board.shape[0]
         width = self.board.shape[1]
         proximityBoard = self.board.copy()
-        radius = 2
+        radius = 5
         proximityMatrix = np.ones((radius, radius))*3
         temp = np.count_nonzero(proximityBoard)
         if (temp > 1):
