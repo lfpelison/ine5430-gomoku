@@ -44,6 +44,7 @@ HEURISTIC = [[0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0, 0, 0],
              [0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0, 0, 0]]
 
 
+#|21th.|
 def hasFinished(state, player, heuristicValues=FINISHED):
     '''
          The output is a boolean indicating if the game is finished
@@ -70,24 +71,25 @@ def hasFinished(state, player, heuristicValues=FINISHED):
         return notFinished
 
 
+#|10th.|
 def calculateHeuristic(state,
                        player,
                        heuristicValues=UTILITY,
                        positionValuesHeuristic=HEURISTIC):
-    '''  
+    '''
          This function calculates the heuristic of sosme move
-         state= numpy matrix of 15x15  with 1's, 0's and -1's meaning the actual 
+         state= numpy matrix of 15x15  with 1's, 0's and -1's meaning the actual
          state of the game
          heuristicValues =  dict with keys with the type of heuristc
          we are searching for.
          positionValuesHeuristic = numpy matrix with same dimension of state
-         matrix, with the values for heuristic of the pieces positions 
-         number_to_play_with= -1 or 1, depeding if we are calculating the pc heuristic or the player heuristic 
+         matrix, with the values for heuristic of the pieces positions
+         number_to_play_with= -1 or 1, depeding if we are calculating the pc heuristic or the player heuristic
          pc_number = 1 ot -1, value that the pc are playing
-         
+
          The output is a integer with the value of a heuristc of the state.
-         
-    '''    
+
+    '''
     sequenceHeuristic = 0
     positionHeuristic = 0
     newState = state.copy()  # make a matrix 17 x 17
@@ -104,9 +106,9 @@ def calculateHeuristic(state,
         occurrences = 0
         sequence = heuristicValues[values][1]
         for seq in sequence:
-            occurrences += searchInList(makeDig(newState, player), seq)
-            occurrences += searchInList(makeCol(newState, player), seq)
-            occurrences += searchInList(makeLin(newState, player), seq)
+            occurrences += searchInList(makeDig(newState, player), seq) #|11th.| and |12th.|
+            occurrences += searchInList(makeCol(newState, player), seq) #|14th.|
+            occurrences += searchInList(makeLin(newState, player), seq) #|15th.|
         sequenceHeuristic += occurrences*ValueSequence
     newState = state.copy()
     if(player == 1):
@@ -121,6 +123,7 @@ def calculateHeuristic(state,
     return HeuristicValue
 
 
+#|11th.|
 def makeDig(matrix, player):
     '''
          Make a vector with the diagonals of the matrix
@@ -169,6 +172,7 @@ def makeDig(matrix, player):
     return diagonal
 
 
+#|15th.|
 def makeLin(matrix, player):
     '''
          Make a vector with the collumns of the matrix
@@ -195,6 +199,7 @@ def makeLin(matrix, player):
     return diagonal
 
 
+#|14th.|
 def makeCol(matrix, player):
     '''
         Make a vector with the lines of the matrix
@@ -222,6 +227,7 @@ def makeCol(matrix, player):
     return diagonal
 
 
+#|12th.|
 def searchInList(Lists, searchFor):
     '''
     List: a list of lists with string values
@@ -229,10 +235,11 @@ def searchInList(Lists, searchFor):
     '''
     occurrences = 0
     for List in Lists:
-        occurrences += countOccurrences(List, searchFor)
+        occurrences += countOccurrences(List, searchFor) #|13th.|
     return occurrences
 
 
+#|13th.|
 def countOccurrences(text, searchFor):
     '''
         Count all occurrences of the string "searchFor" in the text "text"
