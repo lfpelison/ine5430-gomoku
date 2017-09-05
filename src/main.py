@@ -6,16 +6,92 @@ Authors:
     Igor Yamamoto
     Luis Felipe Pelison
 '''
-#Other libs
+# Other libs
 import tkinter as tk
 from tkinter import messagebox
 import numpy as np
 from functools import partial
-#Our libs
-from minimax import decideMove, reset
+# Our libs
+from minimax import minimax
 from heuristic import hasFinished, calculateHeuristic
 
 
+def decideMove(state, pcNumber, playerNumber):
+        nextMove = [0, 0]
+        print("I'm deciding  the move. It may take a while! ")    
+        nextMove = minimax(state)
+        return nextMove
+    
+def reset():
+    return np.zeros((15, 15))
+
+
+class State(object):
+    '''
+    Class description: 
+        Game state (graph nodes).
+    Attributes:
+        board: numpy 2D array.
+        player: 1 (player one) or -1 (player two).
+        heuristic_val: number calculated from heuristics.
+    Methods:
+        get_available_moves: returns all possible moves, given a board configuration.
+        is_valid_move: verify if the move is valid.
+        is_gameover: verify if the state is terminal.
+        calculate_heuristic: returns a numeric value from heuristic function.
+        next_state: returns the next state, from the state itself and a move.
+    '''
+    def __init__(self, board, player):
+        self.board = board
+        self.player = player
+    
+    @property
+    def heuristic_value(self):
+        self._heuristic_value = calculateHeuristic(self.board, self.player)
+        return self._heuristic_value
+    
+    def get_available_moves(self):
+        height = self.board.shape[0]
+        width = self.board.shape[1]
+        proximityBoard = self.board.copy()
+        radius = 5
+        proximityMatrix = np.ones((radius, radius))*3
+        temp = np.count_nonzero(proximityBoard)
+        if (temp > 1):
+            for row in range(height - radius + 1):
+                for col in range(width - radius + 1):
+                    if np.any(self.board[row:row + radius, col:col + radius]):
+                        proximityBoard[row:row + radius, col:col + radius] += proximityMatrix
+        elif temp == 1 and self.board[int(height/2), int(width/2)] == 0: 
+            proximityBoard[int(height/2), int(width/2)] = 3
+        elif temp == 1 and self.board[int(height/2), int(width/2)] != 0: 
+            proximityBoard[int(height/2) - 1, int(width/2) - 1] = 3
+        elif temp == 0: 
+            proximityBoard[int(height/2), int(width/2)] = 3
+            
+        availableMoves = []
+        diffToCenterHeight = abs(np.arange(height) - int(height/2))
+        centerToBorderHeight = np.argsort(diffToCenterHeight)
+        diffToCenterWidth = abs(np.arange(width) - int(width/2))
+        centerToBorderWidth = np.argsort(diffToCenterWidth)
+        for row in centerToBorderHeight:
+            for col in centerToBorderWidth:
+                if (proximityBoard[row][col] % 3 == 0 and proximityBoard[row][col] > 0):
+                    move = (row, col)
+                    availableMoves.append(move)
+        return availableMoves
+    
+    def is_terminal(self):
+        # A board is terminal if it is won or there are no empty spaces.
+        return hasFinished(self.board, self.player)
+    
+    def next_state(self, move):
+        next_board = np.copy(self.board)
+        next_board[move] = self.player
+        next_player = -1*self.player
+        return State(next_board, next_player)
+    
+   
 class Game:
     #The main class! This have all the attibutes and methods to the game works!
     def __init__(self, master):

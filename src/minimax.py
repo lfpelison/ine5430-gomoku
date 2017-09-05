@@ -6,26 +6,50 @@ Authors:
     Igor Yamamoto
     Luis Felipe Pelison
 '''
-from heuristic import calculateHeuristic
 import numpy as np
 
 
-def decideMove(State, numberOfPC, numberOfPlayer):
-        nextMovement = [0, 0]
-        print("I'm deciding  the move. It may take a while! ")    
-        nextMovement = minimax(State, numberOfPC, numberOfPlayer)
-        return nextMovement
-
-
-def reset():
-    return np.zeros((15, 15))
-
-
-def minimax(State, numberOfPC, numberOfPlayer):
+def minimax(state, pcNumber, playerNumber, depth=3):
     '''
-    Apply the minimax algorith using the heuristic function.
+    Apply the minimax algorithm using the heuristic function.
     
     Return a array with the row and the column with the best move for the PC
+    '''
+    player = state.player
+
+    def max_play(state, alpha, beta, depth):
+        if cutoff_test(state, depth):
+            return eval_fn(state)
+        v = -infinity
+        for (a, s) in game.successors(state):
+            v = max(v, min_value(s, alpha, beta, depth+1))
+            if v >= beta:
+                return v
+            alpha = max(alpha, v)
+        return v
+
+    def min_play(state, alpha, beta, depth):
+        if cutoff_test(state, depth):
+            return eval_fn(state)
+        v = infinity
+        for (a, s) in game.successors(state):
+            v = min(v, max_value(s, alpha, beta, depth+1))
+            if v <= alpha:
+                return v
+            beta = min(beta, v)
+        return v
+
+    # Body of alphabeta_search starts here:
+    # The default test cuts off at depth d or at a terminal state
+    cutoff_test = (cutoff_test or
+                   (lambda state,depth: depth>d or game.terminal_test(state)))
+    eval_fn = eval_fn or (lambda state: game.utility(state, player))
+    action, state = argmax(game.successors(state),
+                           lambda a, s: min_value(s, -infinity, infinity, 0))
+    return action
+    
+    
+    
     '''
     listOfHeuristics1 = []
     listOfStates2 = []
@@ -34,17 +58,17 @@ def minimax(State, numberOfPC, numberOfPlayer):
     listOfStates0.append(State)
     bestHeuristic1 = float('-inf')
     bestState1 = State
-    listOfStates1.append(makeChildren(listOfStates0[0], numberOfPC))
+    listOfStates1.append(makeChildren(listOfStates0[0], pcNumber))
     idx = 0
     son1 = len(listOfStates1[0])
     for state1 in listOfStates1[0]:  # loop for the first level
-        listOfStates2.append(makeChildren(state1, numberOfPlayer))
+        listOfStates2.append(makeChildren(state1, playerNumber))
         bestState2 = listOfStates2[idx][0]
         bestHeuristic2 = float('+inf')
         idx2 = 0
         son2 = len(listOfStates2[idx])
         for state2 in listOfStates2[idx]:
-            hr = -calculateHeuristic(state2, numberOfPlayer) + calculateHeuristic( state2, numberOfPC)
+            hr = -calculateHeuristic(state2, playerNumber) + calculateHeuristic( state2, pcNumber)
             idx2 += 1
             if hr < bestHeuristic2:
                 bestHeuristic2 = hr
@@ -57,38 +81,38 @@ def minimax(State, numberOfPC, numberOfPlayer):
         listOfHeuristics1.append(bestHeuristic2)
         print("Iteration: " + str(idx+1) +"/"+ str(son1) +  " - Pruned at:" + str(idx2)+"/"+ str(son2) )
         idx += 1
-    return findMovent(State, bestState1, numberOfPC)
-
+    return findMovent(State, bestState1, pcNumber)
+'''
 
 def makeChildren(state, numberToPlayWith):
-    currState = state.copy()
-    proxState = currState.copy()
-    temp = np.count_nonzero(proxState)
+    self.board = state.copy()
+    proximityBoard = self.board.copy()
+    temp = np.count_nonzero(proximityBoard)
     if ( temp>1 ):
-        proxMatrix = np.ones((5, 5))*3
-        for row in range(currState.shape[0]-4):
-            for col in range(currState.shape[1]-4):
-                if np.any(currState[row:row+5, col:col+5]):
-                    proxState[row:row+5, col:col+5] += proxMatrix
-    elif temp==1 and currState[7][7]==0 : 
-        proxState[7,7]= 3
-    elif temp==1 and currState[7][7]!=0 : 
-        proxState[6,6]= 3
+        proximityMatrix = np.ones((5, 5))*3
+        for row in range(self.board.shape[0]-4):
+            for col in range(self.board.shape[1]-4):
+                if np.any(self.board[row:row+5, col:col+5]):
+                    proximityBoard[row:row+5, col:col+5] += proximityMatrix
+    elif temp==1 and self.board[7][7]==0 : 
+        proximityBoard[7,7]= 3
+    elif temp==1 and self.board[7][7]!=0 : 
+        proximityBoard[6,6]= 3
     elif temp==0 : 
-        proxState[7,7]= 3
+        proximityBoard[7,7]= 3
         
     allStates = []
-    diffToCenter = abs(np.arange(len(currState)) - int(len(currState)/2))
+    diffToCenter = abs(np.arange(len(self.board)) - int(len(self.board)/2))
     centerToBorder = np.argsort(diffToCenter)
     for row in centerToBorder:
         for col in centerToBorder:
-            if (proxState[row][col] % 3 == 0 and proxState[row][col] > 0):
-                newState = currState.copy()
+            if (proximityBoard[row][col] % 3 == 0 and proximityBoard[row][col] > 0):
+                newState = self.board.copy()
                 newState[row][col] = numberToPlayWith
                 allStates.append(newState)
     return allStates
 
 
-def findMovent(currState, nextMove, numberToPlayWith):
-        row, col = np.where((currState + nextMove) == numberToPlayWith)
+def findMovent(self.board, nextMove, numberToPlayWith):
+        row, col = np.where((self.board + nextMove) == numberToPlayWith)
         return [row[0], col[0]]

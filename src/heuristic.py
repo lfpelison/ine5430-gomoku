@@ -44,17 +44,17 @@ HEURISTIC = [[0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0, 0, 0],
              [0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0, 0, 0]]
 
 
-def hasFinished(state, player, heuristicValues=FINISHED):
+def hasFinished(board, player, heuristicValues=FINISHED):
     '''
          The output is a boolean indicating if the game is finished
 
     '''
-    newState = state.copy()  # make a 17 x 17 matrix
+    newBoard = board.copy()  # make a 17 x 17 matrix
     a = np.asarray([[2 for i in range(15)]]).T
-    newState = np.concatenate((a, np.concatenate((newState, a), axis=1)),
+    newBoard = np.concatenate((a, np.concatenate((newBoard, a), axis=1)),
                               axis=1).copy()
     a = np.asarray([[2 for i in range(17)]])
-    newState = np.concatenate((a, np.concatenate((newState, a), axis=0)),
+    newBoard = np.concatenate((a, np.concatenate((newBoard, a), axis=0)),
                               axis=0).copy()
 
     notFinished = True
@@ -62,60 +62,58 @@ def hasFinished(state, player, heuristicValues=FINISHED):
     for values in heuristicValues.keys():
         sequence = heuristicValues[values][1]
         for seq in sequence:
-            occurrences += searchInList(makeDig(newState, player), seq)
-            occurrences += searchInList(makeCol(newState, player), seq)
-            occurrences += searchInList(makeLin(newState, player), seq)
+            occurrences += searchInList(makeDig(newBoard, player), seq)
+            occurrences += searchInList(makeCol(newBoard, player), seq)
+            occurrences += searchInList(makeLin(newBoard, player), seq)
         if(values == 'numberOfQuintet' and occurrences > 0):
             notFinished = False
         return notFinished
 
 
-def calculateHeuristic(state,
+def calculateHeuristic(board,
                        player,
                        heuristicValues=UTILITY,
                        positionValuesHeuristic=HEURISTIC):
     '''  
          This function calculates the heuristic of sosme move
-         state= numpy matrix of 15x15  with 1's, 0's and -1's meaning the actual 
-         state of the game
+         board= numpy matrix of 15x15  with 1's, 0's and -1's meaning the actual 
+         board of the game
          heuristicValues =  dict with keys with the type of heuristc
          we are searching for.
-         positionValuesHeuristic = numpy matrix with same dimension of state
+         positionValuesHeuristic = numpy matrix with same dimension of board
          matrix, with the values for heuristic of the pieces positions 
          number_to_play_with= -1 or 1, depeding if we are calculating the pc heuristic or the player heuristic 
          pc_number = 1 ot -1, value that the pc are playing
          
-         The output is a integer with the value of a heuristc of the state.
+         The output is a integer with the value of a heuristc of the board.
          
     '''    
     sequenceHeuristic = 0
     positionHeuristic = 0
-    newState = state.copy()  # make a matrix 17 x 17
+    newBoard = board.copy()  # make a matrix 17 x 17
     a = np.asarray([[2 for i in range(15)]]).T
-    newState = np.concatenate((a, np.concatenate((newState, a), axis=1)),
+    newBoard = np.concatenate((a, np.concatenate((newBoard, a), axis=1)),
                               axis=1).copy()
     a = np.asarray([[2 for i in range(17)]])
-    newState = np.concatenate((a, np.concatenate((newState, a), axis=0)),
+    newBoard = np.concatenate((a, np.concatenate((newBoard, a), axis=0)),
                               axis=0).copy()
-
-    notFinished = True
     for values in heuristicValues.keys():
         ValueSequence = heuristicValues[values][0]
         occurrences = 0
         sequence = heuristicValues[values][1]
         for seq in sequence:
-            occurrences += searchInList(makeDig(newState, player), seq)
-            occurrences += searchInList(makeCol(newState, player), seq)
-            occurrences += searchInList(makeLin(newState, player), seq)
+            occurrences += searchInList(makeDig(newBoard, player), seq)
+            occurrences += searchInList(makeCol(newBoard, player), seq)
+            occurrences += searchInList(makeLin(newBoard, player), seq)
         sequenceHeuristic += occurrences*ValueSequence
-    newState = state.copy()
+    newBoard = board.copy()
     if(player == 1):
-        np.place(newState, newState == -1, 0)
-        positionHeuristic = np.sum(np.multiply(newState,
+        np.place(newBoard, newBoard == -1, 0)
+        positionHeuristic = np.sum(np.multiply(newBoard,
                                                positionValuesHeuristic))
     else:
-        np.place(newState, newState == 1, 0)
-        positionHeuristic = -np.sum(np.multiply(newState,
+        np.place(newBoard, newBoard == 1, 0)
+        positionHeuristic = -np.sum(np.multiply(newBoard,
                                                 positionValuesHeuristic))
     HeuristicValue = positionHeuristic + sequenceHeuristic
     return HeuristicValue
