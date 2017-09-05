@@ -148,7 +148,7 @@ def calculateHeuristic(board,
         positionHeuristic = -np.sum(np.multiply(newBoard,
                                                 positionValuesHeuristic))
     HeuristicValue = positionHeuristic + sequenceHeuristic
-    return total - HeuristicValue
+    return total - 1.1*HeuristicValue
 
 
 def makeDig(matrix, player):
