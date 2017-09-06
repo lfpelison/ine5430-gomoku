@@ -6,93 +6,50 @@ Authors:
     Igor Yamamoto
     Luis Felipe Pelison
 '''
-from heuristic import calculateHeuristic
-import numpy as np
-
 
 #|7th.|
-def decideMove(State, numberOfPC, numberOfPlayer):
-        nextMovement = [0, 0]
-        print("I'm deciding the move. It may take a while! ")
-        nextMovement = minimax(State, numberOfPC, numberOfPlayer) #|8th.|
-        return nextMovement
-
-
-def reset():
-    return np.zeros((15, 15))
-
-
-#|8th.|
-def minimax(State, numberOfPC, numberOfPlayer):
+def minimax(state, depth=2):
     '''
-    Apply the minimax algorith using the heuristic function.
-
-    Return a array with the row and the column with the best move for the PC
+        Minimax algorithm
     '''
-    listOfHeuristics1 = []
-    listOfStates2 = []
-    listOfStates1 = []
-    listOfStates0 = []
-    listOfStates0.append(State)
-    bestHeuristic1 = float('-inf')
-    bestState1 = State
-    listOfStates1.append(makeChildren(listOfStates0[0], numberOfPC)) #|9th.|
-    idx = 0
-    son1 = len(listOfStates1[0])
-    for state1 in listOfStates1[0]:  # loop for the first level
-        listOfStates2.append(makeChildren(state1, numberOfPlayer)) #|9th.|
-        bestState2 = listOfStates2[idx][0]
-        bestHeuristic2 = float('+inf')
-        idx2 = 0
-        son2 = len(listOfStates2[idx])
-        for state2 in listOfStates2[idx]:
-            hr = -calculateHeuristic(state2, numberOfPlayer) + calculateHeuristic( state2, numberOfPC) #|10th.|
-            idx2 += 1
-            if hr < bestHeuristic2:
-                bestHeuristic2 = hr
-                bestState2 = state2
-            if bestHeuristic2 > bestHeuristic1:
-                bestHeuristic1 = bestHeuristic2
-                bestState1 = state2
-            if idx > 0 and bestHeuristic2 < bestHeuristic1:  # alpha prune
-                break
-        listOfHeuristics1.append(bestHeuristic2)
-        print("Iteration: " + str(idx+1) +"/"+ str(son1) +  " - Pruned at:" + str(idx2)+"/"+ str(son2) )
-        idx += 1
-    return findMovent(State, bestState1, numberOfPC) #|16th.|
 
+    def max_play(state, alpha, beta, d):
+        if state.is_terminal() or d >= depth:
+            return state.heuristic_value
+        node_value = float('-inf')
+        for i, move in enumerate(state.available_moves):
+            node_value = max(node_value, min_play(state.next_state(move),
+                                                  alpha, beta, d+1))
+            if node_value >= beta:
+                #print('val:{} move:{}'.format(node_value, move)) # To debug
+                return node_value
+            alpha = max(alpha, node_value)
+        # print('didnt pruned')
+        return node_value
 
-#|9th.|
-def makeChildren(state, numberToPlayWith):
-    currState = state.copy()
-    proxState = currState.copy()
-    temp = np.count_nonzero(proxState)
-    if ( temp>1 ):
-        proxMatrix = np.ones((5, 5))*3
-        for row in range(currState.shape[0]-4):
-            for col in range(currState.shape[1]-4):
-                if np.any(currState[row:row+5, col:col+5]):
-                    proxState[row:row+5, col:col+5] += proxMatrix
-    elif temp==1 and currState[7][7]==0 :
-        proxState[7,7]= 3
-    elif temp==1 and currState[7][7]!=0 :
-        proxState[6,6]= 3
-    elif temp==0 :
-        proxState[7,7]= 3
+    def min_play(state, alpha, beta, d):
+        if state.is_terminal() or d >= depth:
+            return state.heuristic_value
+        node_value = float('inf')
+        for i, move in enumerate(state.available_moves):
+            node_value = min(node_value, max_play(state.next_state(move),
+                                                  alpha, beta, d+1))
+            if node_value <= alpha:
+                #print('val:{} move:{}'.format(node_value, move)) # To debug
+                return node_value
+            beta = min(beta, node_value)
+        # print('didnt pruned')
+        return node_value
 
-    allStates = []
-    diffToCenter = abs(np.arange(len(currState)) - int(len(currState)/2))
-    centerToBorder = np.argsort(diffToCenter)
-    for row in centerToBorder:
-        for col in centerToBorder:
-            if (proxState[row][col] % 3 == 0 and proxState[row][col] > 0):
-                newState = currState.copy()
-                newState[row][col] = numberToPlayWith
-                allStates.append(newState)
-    return allStates
-
-
-#|16th|
-def findMovent(currState, nextMove, numberToPlayWith):
-        row, col = np.where((currState + nextMove) == numberToPlayWith)
-        return [row[0], col[0]]
+    alpha = float('-inf')
+    beta = float('inf')
+    node_value = float('-inf')
+    next_move = state.available_moves[0]
+    for i, move in enumerate(state.available_moves):
+        neighbor_value = min_play(state.next_state(move), alpha, beta, 1)
+        # print('child {}/{}: '.format(i, len(state.available_moves)))
+        if neighbor_value > node_value:
+            node_value = neighbor_value
+            next_move = move
+        alpha = max(alpha, node_value)
+    return next_move

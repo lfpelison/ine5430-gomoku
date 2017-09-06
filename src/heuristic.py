@@ -12,20 +12,20 @@ import numpy as np
 import regex as re
 
 
-UTILITY = {'numberOfQuintet': [200000, ['xxxxx']],
-           'numberOfQuartet_2Opens': [120000, ['exxxxe']],
-           'numberOfQuartet_1Open': [50000, ['nxxxxe', 'exxxxn']],
-           'numberOfTriplet_2Opens': [30000, ['exxxe']],
-           'numberOfTriplet_1Open': [15000, ['nxxxee', 'eexxxn']],
-           'numberOfProbQuartet_2Opens': [7000, ['exexxe', 'exxexe']],
-           'numberOfProbQuartet_1Open': [3000, ['nxexxe',
+UTILITY = {'Quintet': [20000000, ['xxxxx']],
+           'Quartet_2Opens': [400000, ['exxxxe']],
+           'Quartet_1Open': [50000, ['nxxxxe', 'exxxxn']],
+           'Triplet_2Opens': [30000, ['exxxe']],
+           'Triplet_1Open': [15000, ['nxxxee', 'eexxxn']],
+           'ProbQuartet_2Opens': [7000, ['exexxe', 'exxexe']],
+           'ProbQuartet_1Open': [3000, ['nxexxe',
                                                 'nxxexe', 'exxexn', 'exexxn']],
-           'numberOfDouble_2Opens': [500, ['eexxe', 'exxee']],
-           'numberOfDouble_1Open': [400, ['nxxeee', 'eeexxn']],
-           'numberOfProbTriplet_2Opens': [100, ['exexe']],
-           'numberOfProbTriplet_1Open': [40, ['nxexee', 'eexexn']]}
+           'Double_2Opens': [500, ['eexxe', 'exxee']],
+           'Double_1Open': [400, ['nxxeee', 'eeexxn']],
+           'nProbTriplet_2Opens': [100, ['exexe']],
+           'ProbTriplet_1Open': [40, ['nxexee', 'eexexn']]}
 
-FINISHED = {'numberOfQuintet': [200000, ['xxxxx']]}
+FINISHED = {'Quintet': [200000, ['xxxxx']]}
 
 HEURISTIC = [[0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0, 0, 0],
              [0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0, 0, 0],
@@ -45,82 +45,112 @@ HEURISTIC = [[0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0, 0, 0],
 
 
 #|21th.|
-def hasFinished(state, player, heuristicValues=FINISHED):
+def hasWinnerSeq(board, lastPlayer, winnerSeq='xxxxx'):
     '''
-         The output is a boolean indicating if the game is finished
+         The output is a boolean indicating if the board has a winner sequence.
 
     '''
-    newState = state.copy()  # make a 17 x 17 matrix
+    newBoard = board.copy()
     a = np.asarray([[2 for i in range(15)]]).T
-    newState = np.concatenate((a, np.concatenate((newState, a), axis=1)),
+    newBoard = np.concatenate((a, np.concatenate((newBoard, a), axis=1)),
                               axis=1).copy()
     a = np.asarray([[2 for i in range(17)]])
-    newState = np.concatenate((a, np.concatenate((newState, a), axis=0)),
+    newBoard = np.concatenate((a, np.concatenate((newBoard, a), axis=0)),
                               axis=0).copy()
-
-    notFinished = True
-    occurrences = 0
-    for values in heuristicValues.keys():
-        sequence = heuristicValues[values][1]
-        for seq in sequence:
-            occurrences += searchInList(makeDig(newState, player), seq)
-            occurrences += searchInList(makeCol(newState, player), seq)
-            occurrences += searchInList(makeLin(newState, player), seq)
-        if(values == 'numberOfQuintet' and occurrences > 0):
-            notFinished = False
-        return notFinished
+    count = 0
+    count += searchInList(makeDig(newBoard, lastPlayer), winnerSeq)
+    count += searchInList(makeCol(newBoard, lastPlayer), winnerSeq)
+    count += searchInList(makeLin(newBoard, lastPlayer), winnerSeq)
+    if count > 0:
+        return True
+    else:
+        return False
 
 
 #|10th.|
-def calculateHeuristic(state,
+def calculateHeuristic(board,
                        player,
                        heuristicValues=UTILITY,
                        positionValuesHeuristic=HEURISTIC):
     '''
          This function calculates the heuristic of sosme move
-         state= numpy matrix of 15x15  with 1's, 0's and -1's meaning the actual
-         state of the game
+         board= numpy matrix of 15x15  with 1's, 0's and -1's meaning the actual
+         board of the game
          heuristicValues =  dict with keys with the type of heuristc
          we are searching for.
-         positionValuesHeuristic = numpy matrix with same dimension of state
+         positionValuesHeuristic = numpy matrix with same dimension of board
          matrix, with the values for heuristic of the pieces positions
          number_to_play_with= -1 or 1, depeding if we are calculating the pc heuristic or the player heuristic
          pc_number = 1 ot -1, value that the pc are playing
 
-         The output is a integer with the value of a heuristc of the state.
+         The output is a integer with the value of a heuristc of the board.
 
     '''
     sequenceHeuristic = 0
     positionHeuristic = 0
-    newState = state.copy()  # make a matrix 17 x 17
+    newBoard = board.copy()
     a = np.asarray([[2 for i in range(15)]]).T
-    newState = np.concatenate((a, np.concatenate((newState, a), axis=1)),
+    newBoard = np.concatenate((a, np.concatenate((newBoard, a), axis=1)),
                               axis=1).copy()
     a = np.asarray([[2 for i in range(17)]])
-    newState = np.concatenate((a, np.concatenate((newState, a), axis=0)),
+    newBoard = np.concatenate((a, np.concatenate((newBoard, a), axis=0)),
                               axis=0).copy()
-
-    notFinished = True
     for values in heuristicValues.keys():
         ValueSequence = heuristicValues[values][0]
-        occurrences = 0
+        count = 0
         sequence = heuristicValues[values][1]
         for seq in sequence:
-            occurrences += searchInList(makeDig(newState, player), seq) #|11th.| and |12th.|
-            occurrences += searchInList(makeCol(newState, player), seq) #|14th.|
-            occurrences += searchInList(makeLin(newState, player), seq) #|15th.|
-        sequenceHeuristic += occurrences*ValueSequence
-    newState = state.copy()
+            count += searchInList(makeDig(newBoard, player), seq)
+            count += searchInList(makeCol(newBoard, player), seq)
+            count += searchInList(makeLin(newBoard, player), seq)
+        sequenceHeuristic += count*ValueSequence
+    newBoard = board.copy()
     if(player == 1):
-        np.place(newState, newState == -1, 0)
-        positionHeuristic = np.sum(np.multiply(newState,
+        np.place(newBoard, newBoard == -1, 0)
+        positionHeuristic = np.sum(np.multiply(newBoard,
                                                positionValuesHeuristic))
     else:
-        np.place(newState, newState == 1, 0)
-        positionHeuristic = -np.sum(np.multiply(newState,
+        np.place(newBoard, newBoard == 1, 0)
+        positionHeuristic = -np.sum(np.multiply(newBoard,
                                                 positionValuesHeuristic))
     HeuristicValue = positionHeuristic + sequenceHeuristic
-    return HeuristicValue
+
+    total = HeuristicValue
+
+
+
+
+
+    player = -1*player
+    sequenceHeuristic = 0
+    positionHeuristic = 0
+    newBoard = board.copy()
+    a = np.asarray([[2 for i in range(15)]]).T
+    newBoard = np.concatenate((a, np.concatenate((newBoard, a), axis=1)),
+                              axis=1).copy()
+    a = np.asarray([[2 for i in range(17)]])
+    newBoard = np.concatenate((a, np.concatenate((newBoard, a), axis=0)),
+                              axis=0).copy()
+    for values in heuristicValues.keys():
+        ValueSequence = heuristicValues[values][0]
+        count = 0
+        sequence = heuristicValues[values][1]
+        for seq in sequence:
+            count += searchInList(makeDig(newBoard, player), seq)
+            count += searchInList(makeCol(newBoard, player), seq)
+            count += searchInList(makeLin(newBoard, player), seq)
+        sequenceHeuristic += count*ValueSequence
+    newBoard = board.copy()
+    if(player == 1):
+        np.place(newBoard, newBoard == -1, 0)
+        positionHeuristic = np.sum(np.multiply(newBoard,
+                                               positionValuesHeuristic))
+    else:
+        np.place(newBoard, newBoard == 1, 0)
+        positionHeuristic = -np.sum(np.multiply(newBoard,
+                                                positionValuesHeuristic))
+    HeuristicValue = positionHeuristic + sequenceHeuristic
+    return total - 1.05*HeuristicValue #PC heuristics versus - Human heuristics with a gain
 
 
 #|11th.|
@@ -233,10 +263,10 @@ def searchInList(Lists, searchFor):
     List: a list of lists with string values
     seachFor: string to search for
     '''
-    occurrences = 0
+    count = 0
     for List in Lists:
-        occurrences += countOccurrences(List, searchFor) #|13th.|
-    return occurrences
+        count += countOccurrences(List, searchFor)
+    return count
 
 
 #|13th.|
