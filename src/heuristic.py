@@ -12,7 +12,7 @@ import numpy as np
 import regex as re
 
 
-UTILITY = {'Quintet': [2000000, ['xxxxx']],
+UTILITY = {'Quintet': [20000000, ['xxxxx']],
            'Quartet_2Opens': [400000, ['exxxxe']],
            'Quartet_1Open': [50000, ['nxxxxe', 'exxxxn']],
            'Triplet_2Opens': [30000, ['exxxe']],
@@ -150,7 +150,7 @@ def calculateHeuristic(board,
         positionHeuristic = -np.sum(np.multiply(newBoard,
                                                 positionValuesHeuristic))
     HeuristicValue = positionHeuristic + sequenceHeuristic
-    return total - 1.1*HeuristicValue
+    return total - 1.05*HeuristicValue #PC heuristics versus - Human heuristics with a gain
 
 
 #|11th.|

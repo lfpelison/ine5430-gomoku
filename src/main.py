@@ -17,6 +17,7 @@ from minimax import minimax
 from heuristic import hasWinnerSeq, calculateHeuristic
 
 
+#|4th.| The description is below
 class State(object):
     '''
     Class description:
@@ -45,7 +46,7 @@ class State(object):
         height = self.board.shape[0]
         width = self.board.shape[1]
         proximityBoard = self.board.copy()
-        radius = 5
+        radius = 3
         proximityMatrix = np.ones((radius, radius))*3
         temp = np.count_nonzero(proximityBoard)
         if (temp > 1):
@@ -70,13 +71,14 @@ class State(object):
                 if (proximityBoard[row][col] % 3 == 0 and proximityBoard[row][col] > 0):
                     move = (row, col)
                     self._available_moves.append(move)
+
         return self._available_moves
 
     def is_terminal(self):
         # A board is terminal if it is won or there are no empty spaces.
         if not (0 in self.board):
             return True
-        if hasWinnerSeq(self.board, -1*self.player):
+        if hasWinnerSeq(self.board, self.player):
             return True
         else:
             return False
@@ -103,9 +105,12 @@ class Game:
         self.root.title('Gomoku Game')
         #img = tk.PhotoImage(file='../img/favicon.png')
         #self.root.tk.call('wm', 'iconphoto', self.root._w, img)
+        self.height = height
+        self.width = width
         self.bottomFrame = tk.Frame(self.root)
         self.bottomFrame.grid(row=15, columnspan=155)
-
+        self.btn = tk.Button(self.bottomFrame, text='My text')
+        self.btn.config(state='disabled', relief=tk.SUNKEN)
         self.printCredits = tk.Text(self.bottomFrame, width=117, height=7, bg='#D9D9D9')
         self.printCredits.grid(row=21, columnspan=2)
         self.printCredits.insert('end', 'Authors: \n\t - Luis Felipe Pelison\
@@ -115,28 +120,25 @@ class Game:
                                  text='Quit',
                                  command=self.quit)
         self.quitBtn.grid(row=18, columnspan=5)
-        reset_with_arg = partial(self.reset, self.root)
+        reset_with_arg = partial(self.reset)
         self.Reset = tk.Button(self.bottomFrame,
                                text='Reset Game',
                                command=reset_with_arg)
         self.Reset.grid(row=19, columnspan=5)
 
+
+        # Attributes more importants
         self.createButtons(self.root) #|3rd.|
-        self.btn = tk.Button(self.bottomFrame, text='My text')
-        self.btn.config(state='disabled', relief=tk.SUNKEN)
-        self.height = height
-        self.width = width
-
-
         initial_board = np.zeros((height, width)) # Structure of initial state: all 0
-        player_one = 1 #TODO: Is it used?
-        self.current_state = State(initial_board, player_one)
-        self.isPlayerOneHuman = self.isHuman('One')
+        player_one = 1
+        self.current_state = State(initial_board, player_one) #|4th.| Call the class State
+        self.isPlayerOneHuman = self.isHuman('One') #|5th.| Verifies who is
         self.isPlayerTwoHuman = self.isHuman('Two')
 
-        #TODO: Change this!
+
         if (not self.isPlayerOneHuman) and self.current_state.player == 1:
             self.PCMove()
+
 
     #|6th.| Changes the interface's buttons by the PC movement (row and column)
     def PCMove(self):
@@ -175,6 +177,8 @@ class Game:
         print('O PC Jogou, o novo estado é: {}'.format(self.current_state.player))
         #self.current_state.player = -1 * self.current_state.player
         #print('Agora trocou, o HUMANO deverá jogar. Seu novo estado é {}'.format(self.current_state.player))
+        if (not self.isPlayerOneHuman) and (not self.isPlayerTwoHuman):
+            self.PCMove()
         print('Waiting a move from a Human')
 
 
@@ -240,7 +244,8 @@ class Game:
             print('Seu estado é: {}'.format(self.current_state.player))
             self.current_state.player = -1
             print('Agora, seu estado é: {}'.format(self.current_state.player))
-            self.PCMove()
+            if not self.isPlayerTwoHuman:
+                self.PCMove()
             print('O Pc já jogou, pode dale')
 
         elif (self.current_state.player == -1 and self.current_state.board[self.buttons
@@ -262,11 +267,12 @@ class Game:
             print('Seu estado é: {}'.format(self.current_state.player))
             self.current_state.player = 1
             print('Agora, seu estado é: {}'.format(self.current_state.player))
-            self.PCMove()
+            if not self.isPlayerOneHuman:
+                self.PCMove()
             print('O Pc já jogou, pode dale')
 
 
-    #|4th.| We can have 2 players: humans or PCs
+    #|5th.| We can have 2 players: humans or PCs
     def isHuman(self, number):
         '''
             Function to choose wether the player is human or not.
@@ -306,6 +312,21 @@ class Game:
         self.current_state = State(initial_board, player_one)
         for btn in self.buttons.keys():
             self.buttons[btn][0].destroy()
+
+
+        self.createButtons(self.root) #|3rd.|
+        initial_board = np.zeros((self.height, self.width)) # Structure of initial state: all 0
+        player_one = 1
+        self.current_state = State(initial_board, player_one) #|4th.| Call the class State
+        self.isPlayerOneHuman = self.isHuman('One') #|5th.| Verifies who is
+        self.isPlayerTwoHuman = self.isHuman('Two')
+
+
+        if (not self.isPlayerOneHuman) and (self.isPlayerTwoHuman) and self.current_state.player == 1:
+            self.PCMove()
+
+        '''
+
         self.createButtons(self.root)
         self.player = self.choosePlayer()
         if(self.player == -1):
@@ -318,6 +339,8 @@ class Game:
             print('----')
             print('Waiting a move')
 
+        '''
+
 
     def run(self):
         self.root.mainloop()
@@ -325,5 +348,5 @@ class Game:
 
 #|1st.| Here is where all happens.
 if __name__ == '__main__':
-    gomoku = Game()
+    gomoku = Game() #|2nd.| Create an instance of the main class
     gomoku.run()
