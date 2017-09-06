@@ -143,18 +143,18 @@ class Game:
     #|6th.| Changes the interface's buttons by the PC movement (row and column)
     def PCMove(self):
         # Remember: buttons > {number from 0 to 15*15: list of [button object, id:'row-col', row, col]}
-        print('O PC VAI JOGAR! PREPARE-SE!')
+        print('The PC will play! Fasten your seats belts!')
         move = minimax(self.current_state) #|7th.| This function is at minimax.py
         print(move)
         btn = self.buttons[self.findBt(move)][0] #|17th.| #AND Changes color
         if (self.current_state.player == 1):
             btn.config(bg='black')
             btn.config(state='disabled', relief=tk.SUNKEN)
-            print('O PC é o estado 1, logo é PRETO')
+            print('Black moved.')
         else:
             btn.config(bg='white')
             btn.config(state='disabled', relief=tk.SUNKEN)
-            print('O PC é o estado -1, logo é BRANCO')
+            print('White moved.')
         self.current_state = self.current_state.next_state(move) #Ver isso
         self.root.update()
 
@@ -174,12 +174,12 @@ class Game:
                 self.quitBtn.invoke()
                 return 1
 
-        print('O PC Jogou, o novo estado é: {}'.format(self.current_state.player))
+        #print('O PC Jogou, o novo estado é: {}'.format(self.current_state.player))
         #self.current_state.player = -1 * self.current_state.player
         #print('Agora trocou, o HUMANO deverá jogar. Seu novo estado é {}'.format(self.current_state.player))
         if (not self.isPlayerOneHuman) and (not self.isPlayerTwoHuman):
             self.PCMove()
-        print('Waiting a move from a Human')
+        print('Waiting a move...')
 
 
     #|3rd.| This method creates the graphic interface
@@ -240,13 +240,13 @@ class Game:
                     self.quitBtn.invoke()
                     return 1
 
-            print('Você é o preto')
-            print('Seu estado é: {}'.format(self.current_state.player))
+            print('BLACK!')
+            #print('Seu estado é: {}'.format(self.current_state.player))
             self.current_state.player = -1
-            print('Agora, seu estado é: {}'.format(self.current_state.player))
+            #print('Agora, seu estado é: {}'.format(self.current_state.player))
             if not self.isPlayerTwoHuman:
                 self.PCMove()
-            print('O Pc já jogou, pode dale')
+            print('Are you ready?')
 
         elif (self.current_state.player == -1 and self.current_state.board[self.buttons
                                                                         [btn][2]][self.buttons
@@ -263,13 +263,13 @@ class Game:
                     self.quitBtn.invoke()
                     return 1
 
-            print('Você é o branco')
-            print('Seu estado é: {}'.format(self.current_state.player))
+            print('WHITE!')
+            #print('Seu estado é: {}'.format(self.current_state.player))
             self.current_state.player = 1
-            print('Agora, seu estado é: {}'.format(self.current_state.player))
+            #print('Agora, seu estado é: {}'.format(self.current_state.player))
             if not self.isPlayerOneHuman:
                 self.PCMove()
-            print('O Pc já jogou, pode dale')
+            print('Are you ready?')
 
 
     #|5th.| We can have 2 players: humans or PCs
