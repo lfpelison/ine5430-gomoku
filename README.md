@@ -3,7 +3,7 @@ Universidade Federal de Santa Catarina
 
 First task of AI classes at UFSC. Searching algorithms.
 
-MiniMax algorithm with Alpha-Beta pruning
+MiniMax algorithm with Alpha-Beta pruning to play the GOMOKU game.
 
 The report/PDF solution is in Portuguese at `./solution.PDF`
 
