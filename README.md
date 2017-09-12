@@ -1,20 +1,22 @@
-# ine5430 - Trabalho 1
+# ine5430 - Minimax task
 Universidade Federal de Santa Catarina
 
-Trabalho 1 da disciplina de Inteligência Artificial - Métodos de busca
+First task of AI classes at UFSC. Searching algorithms.
 
-Algoritmo MinMax com Poda Alpha-Beta
+MiniMax algorithm with Alpha-Beta pruning
 
-Implementação em Python 3
+The report/PDF solution is in Portuguese at `./solution.PDF`
 
-Autores:
+Python 3 implementation.
+
+Authors:
 - Andrei Donati
 - Ígor Yamamoto
 - Luis Felipe Pelison
 
-Instruções de uso:
-- Utilizar python 3
-- git clone git@github.com:igoryamamoto/ine5430-gomoku.git
+Instructions:
+- Use python 3
+- git clone git@github.com:lfpelison/ine5430-gomoku.git
 - cd ine5430-gomoku/
 - pip install -r requirements.txt
 - cd src/
